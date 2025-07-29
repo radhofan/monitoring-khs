@@ -1,0 +1,15 @@
+1. kontrak sedang berjalan                                                     # DONE
+   a. jumlah kontrak
+2. kontrak selesai                                                             # DONE
+   a. mana yang sudah terbayar semua dan mana yang msh pending 
+3. Kolom SP                                                                    # DONE
+4. Total proyek per vendor                                                     # DONE
+5. Case susah: - kontrak lama (ex 15 bln)                                      # DONE
+   Case susah: - filter vendor                                                 # DONE
+   Case susah: - filter kontrak                                                # DONE
+
+6. CSS
+7. Animation
+8. fix github
+9. filter kontrak / vendor
+10. termin amandemen kontrak?
