@@ -11,13 +11,16 @@ export interface Kontrak {
   tanggalMulai: string;
   tanggalSelesai: string;
   terminPembayaran: string;
-  infoStatusPembayaran: 'Terbayar Semua' | 'Belum Terbayar Semua' | 'Terbayar Sebagian'
+  infoStatusPembayaran:
+    | 'Terbayar Semua'
+    | 'Belum Terbayar Semua'
+    | 'Terbayar Sebagian';
   dataStatusPembayaran: Record<number, TerminDetail>;
 }
 
 export interface TerminDetail {
-  status: 'Terbayar' | 'Belum Terbayar'; 
-  dokumen?: string[]; 
+  status: 'Terbayar' | 'Belum Terbayar';
+  dokumen?: string[];
 }
 
 export interface Vendor {
@@ -42,5 +45,3 @@ export type SuratPeringatan = {
   tanggal: string;
   alasan: string;
 };
-
-

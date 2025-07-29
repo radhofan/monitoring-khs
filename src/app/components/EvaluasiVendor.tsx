@@ -1,15 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  Modal,
-  Form,
-  Select,
-  Button,
-  Row,
-  Col,
-  Result,
-} from 'antd';
+import { Modal, Form, Select, Button, Row, Col, Result } from 'antd';
 import { Kontrak } from '@/app/types';
 import { CheckCircleOutlined } from '@ant-design/icons';
 
@@ -30,7 +22,7 @@ export default function EvaluasiVendorModal({
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = () => {
-    form.validateFields().then(values => {
+    form.validateFields().then((values) => {
       console.log('Submitted Evaluasi:', values);
       // Simulate API call
       setTimeout(() => {
@@ -55,7 +47,9 @@ export default function EvaluasiVendorModal({
       {submitted ? (
         <Result
           status="success"
-          icon={<CheckCircleOutlined style={{ color: 'green', fontSize: 64 }} />}
+          icon={
+            <CheckCircleOutlined style={{ color: 'green', fontSize: 64 }} />
+          }
           title="Evaluasi Berhasil Dikirim!"
           subTitle="Data evaluasi vendor telah disimpan dengan baik."
           extra={[
@@ -66,9 +60,15 @@ export default function EvaluasiVendorModal({
         />
       ) : (
         <>
-          <p><strong>Nama Proyek:</strong> {data.namaPekerjaan}</p>
-          <p><strong>Tanggal Berlaku Kontrak:</strong> {data.tanggalMulai}</p>
-          <p><strong>Tanggal Selesai Kontrak:</strong> {data.tanggalSelesai}</p>
+          <p>
+            <strong>Nama Proyek:</strong> {data.namaPekerjaan}
+          </p>
+          <p>
+            <strong>Tanggal Berlaku Kontrak:</strong> {data.tanggalMulai}
+          </p>
+          <p>
+            <strong>Tanggal Selesai Kontrak:</strong> {data.tanggalSelesai}
+          </p>
 
           <Form layout="vertical" form={form}>
             <Form.Item
@@ -91,10 +91,16 @@ export default function EvaluasiVendorModal({
               rules={[{ required: true, message: 'Harap pilih nilai.' }]}
             >
               <Select placeholder="Pilih nilai kualitas pekerjaan">
-                <Option value={100}>100 – Sesuai ekspektasi, tidak ada temuan major</Option>
-                <Option value={80}>80 – Baik, tidak ada temuan major tapi ada improvement</Option>
+                <Option value={100}>
+                  100 – Sesuai ekspektasi, tidak ada temuan major
+                </Option>
+                <Option value={80}>
+                  80 – Baik, tidak ada temuan major tapi ada improvement
+                </Option>
                 <Option value={60}>60 – Revisi ≤ 30%</Option>
-                <Option value={30}>30 – Tidak sesuai standar, temuan major tidak diperbaiki</Option>
+                <Option value={30}>
+                  30 – Tidak sesuai standar, temuan major tidak diperbaiki
+                </Option>
               </Select>
             </Form.Item>
 
@@ -104,10 +110,18 @@ export default function EvaluasiVendorModal({
               rules={[{ required: true, message: 'Harap pilih nilai.' }]}
             >
               <Select placeholder="Pilih nilai komunikasi & dokumentasi">
-                <Option value={100}>100 – Respons sangat cepat, dokumen lengkap & rapi</Option>
-                <Option value={80}>80 – Respons cepat, dokumen lengkap (perbaikan minor)</Option>
-                <Option value={60}>60 – Respons lambat, dokumen perlu revisi major</Option>
-                <Option value={30}>30 – Respons lambat, dokumen terlambat</Option>
+                <Option value={100}>
+                  100 – Respons sangat cepat, dokumen lengkap & rapi
+                </Option>
+                <Option value={80}>
+                  80 – Respons cepat, dokumen lengkap (perbaikan minor)
+                </Option>
+                <Option value={60}>
+                  60 – Respons lambat, dokumen perlu revisi major
+                </Option>
+                <Option value={30}>
+                  30 – Respons lambat, dokumen terlambat
+                </Option>
               </Select>
             </Form.Item>
 

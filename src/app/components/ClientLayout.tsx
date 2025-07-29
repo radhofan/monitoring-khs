@@ -15,11 +15,18 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
     return () => clearTimeout(timeout);
   }, []);
 
-  if (isAuthPage) return <>{children}</>; 
+  if (isAuthPage) return <>{children}</>;
 
   if (!isReady) {
     return (
-      <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div
+        style={{
+          height: '100vh',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
         <Spin size="large" />
       </div>
     );

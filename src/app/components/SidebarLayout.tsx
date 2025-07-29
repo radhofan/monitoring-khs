@@ -15,7 +15,11 @@ import { usePathname } from 'next/navigation';
 
 const { Sider, Header, Content, Footer } = Layout;
 
-export default function SidebarLayout({ children }: { children: React.ReactNode }) {
+export default function SidebarLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
 
@@ -90,15 +94,38 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
           {!collapsed && (
             <>
               <div style={{ marginBottom: '390%' }}></div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginBottom: 8,
+                }}
+              >
                 <UserOutlined />
-                <span style={{ fontSize: 16, fontWeight: 'bold' }}>Radho Ramdhani</span>
+                <span style={{ fontSize: 16, fontWeight: 'bold' }}>
+                  Radho Ramdhani
+                </span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginBottom: 8,
+                }}
+              >
                 <MailOutlined />
                 <span style={{ fontSize: 14 }}>radho@email.com</span>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  marginBottom: 8,
+                }}
+              >
                 <ApartmentOutlined />
                 <span style={{ fontSize: 14 }}>Bidang Perencanaan</span>
               </div>
@@ -107,14 +134,21 @@ export default function SidebarLayout({ children }: { children: React.ReactNode 
         </div>
       </Sider>
 
-      <Layout style={{ marginLeft: collapsed ? 80 : 200, transition: 'all 0.2s ease' }}>
+      <Layout
+        style={{
+          marginLeft: collapsed ? 80 : 200,
+          transition: 'all 0.2s ease',
+        }}
+      >
         <Header style={{ padding: 0, background: '#fff' }} />
         <Content style={{ margin: '24px 16px 0' }}>
           <div style={{ padding: 24, background: '#fff', minHeight: 360 }}>
             {children}
           </div>
         </Content>
-        <Footer style={{ textAlign: 'center' }}>© 2025 PLN KHS Monitoring System</Footer>
+        <Footer style={{ textAlign: 'center' }}>
+          © 2025 PLN KHS Monitoring System
+        </Footer>
       </Layout>
     </Layout>
   );

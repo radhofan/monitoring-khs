@@ -13,7 +13,12 @@ import {
   Result,
 } from 'antd';
 import { Kontrak } from '@/app/types';
-import { FileOutlined, InboxOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import {
+  FileOutlined,
+  InboxOutlined,
+  CheckCircleOutlined,
+} from '@ant-design/icons';
+import type { UploadFile, FormItemProps } from 'antd';
 
 const { Step } = Steps;
 const { Paragraph, Text, Link } = Typography;
@@ -26,12 +31,17 @@ interface ViewPembayaranModalProps {
   onClose: () => void;
 }
 
+interface PembayaranFormData {
+  termin: string;
+  dokumen: UploadFile[];
+}
+
 export default function ViewPembayaranModal({
   visible,
   data,
   onClose,
 }: ViewPembayaranModalProps) {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<PembayaranFormData>();
   const [uploading, setUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
@@ -39,7 +49,7 @@ export default function ViewPembayaranModal({
     ([a], [b]) => Number(a) - Number(b)
   );
 
-  const handleSubmit = (values: any) => {
+  const handleSubmit = (values: PembayaranFormData) => {
     console.log('Form submitted:', values);
     setUploading(true);
 
@@ -56,6 +66,9 @@ export default function ViewPembayaranModal({
     onClose();
   };
 
+  const normFile: NonNullable<FormItemProps['getValueFromEvent']> = (e) =>
+    Array.isArray(e) ? e : (e?.fileList ?? []);
+
   return (
     <Modal
       open={visible}
@@ -64,15 +77,15 @@ export default function ViewPembayaranModal({
       title="Detail Pembayaran Kontrak"
       width={700}
       bodyStyle={{
-        maxHeight: "70vh",
-        overflowY: "auto",
+        maxHeight: '70vh',
+        overflowY: 'auto',
       }}
     >
       {submitted ? (
         <Result
           status="success"
           icon={
-            <CheckCircleOutlined style={{ color: "green", fontSize: 64 }} />
+            <CheckCircleOutlined style={{ color: 'green', fontSize: 64 }} />
           }
           title="Pembayaran Berhasil Dikirim!"
           subTitle="Dokumen pembayaran telah berhasil diunggah dan sedang diproses."
@@ -98,7 +111,7 @@ export default function ViewPembayaranModal({
             direction="vertical"
             size="small"
             current={
-              terminList.filter(([, val]) => val.status === "Terbayar").length -
+              terminList.filter(([, val]) => val.status === 'Terbayar').length -
               1
             }
           >
@@ -106,13 +119,13 @@ export default function ViewPembayaranModal({
               <Step
                 key={termin}
                 title={`Termin ${termin}`}
-                status={detail.status === "Terbayar" ? "finish" : "wait"}
+                status={detail.status === 'Terbayar' ? 'finish' : 'wait'}
                 description={
                   <>
                     <Paragraph style={{ marginBottom: 4 }}>
                       <Text
                         type={
-                          detail.status === "Terbayar" ? "success" : "danger"
+                          detail.status === 'Terbayar' ? 'success' : 'danger'
                         }
                       >
                         {detail.status}
@@ -141,7 +154,7 @@ export default function ViewPembayaranModal({
             <strong>Input Pembayaran:</strong>
           </p>
 
-          <Form
+          <Form<PembayaranFormData>
             form={form}
             layout="vertical"
             onFinish={handleSubmit}
@@ -150,7 +163,7 @@ export default function ViewPembayaranModal({
             <Form.Item
               name="termin"
               label="Termin Pembayaran"
-              rules={[{ required: true, message: "Pilih termin pembayaran" }]}
+              rules={[{ required: true, message: 'Pilih termin pembayaran' }]}
             >
               <Select placeholder="Pilih termin">
                 {terminList.map(([key]) => (
@@ -165,9 +178,9 @@ export default function ViewPembayaranModal({
               name="dokumen"
               label="Upload Dokumen Pembayaran"
               valuePropName="fileList"
-              getValueFromEvent={(e) => (Array.isArray(e) ? e : e?.fileList)}
+              getValueFromEvent={normFile}
               rules={[
-                { required: true, message: "Upload minimal satu dokumen" },
+                { required: true, message: 'Upload minimal satu dokumen' },
               ]}
             >
               <Dragger name="files" multiple beforeUpload={() => false}>

@@ -8,8 +8,10 @@
    Case susah: - filter vendor                                                 # DONE
    Case susah: - filter kontrak                                                # DONE
 
-6. CSS
-7. Animation
-8. fix github
-9. filter kontrak / vendor
-10. termin amandemen kontrak?
+6. CSS                                                                         # DONE
+7. Animation                                                                   # DONE 
+8. fix github                                                                  # DONE
+9. filter kontrak / vendor                                                     # DONE
+10. termin amandemen kontrak?                                                  
+11. eslint errors                                                              # DONE
+12. organic design

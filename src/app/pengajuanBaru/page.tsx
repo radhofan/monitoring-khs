@@ -22,30 +22,46 @@ import { motion, AnimatePresence } from 'framer-motion';
 const { Title, Text } = Typography;
 const { Option } = Select;
 
+type FormState = {
+  namaPekerjaan: string;
+  tipePekerjaan: string;
+  direksi: string;
+  pengawas: string;
+  vendor: string;
+  nilai: number | null;
+  nomorKontrak: string;
+  tanggalMulai: dayjs.Dayjs | null;
+  tanggalSelesai: dayjs.Dayjs | null;
+};
+
 export default function PengajuanBaruPage() {
   const router = useRouter();
 
-  const [terminType, setTerminType] = useState<'milestone' | 'tanggal'>('milestone');
+  const [terminType, setTerminType] = useState<'milestone' | 'tanggal'>(
+    'milestone'
+  );
   const [milestoneCount, setMilestoneCount] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     namaPekerjaan: '',
     tipePekerjaan: '',
     direksi: '',
     pengawas: '',
     vendor: '',
-    nilai: null as number | null,
+    nilai: null,
     nomorKontrak: '',
-    tanggalMulai: null as dayjs.Dayjs | null,
-    tanggalSelesai: null as dayjs.Dayjs | null,
+    tanggalMulai: null,
+    tanggalSelesai: null,
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof FormState, string>>
+  >({});
 
-  const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+  const validateForm = (): Partial<Record<keyof FormState, string>> => {
+    const newErrors: Partial<Record<keyof FormState, string>> = {};
     if (!form.namaPekerjaan.trim()) newErrors.namaPekerjaan = 'Wajib diisi';
     if (!form.tipePekerjaan) newErrors.tipePekerjaan = 'Wajib diisi';
     if (!form.direksi.trim()) newErrors.direksi = 'Wajib diisi';
@@ -56,6 +72,14 @@ export default function PengajuanBaruPage() {
     if (!form.tanggalMulai) newErrors.tanggalMulai = 'Wajib diisi';
     if (!form.tanggalSelesai) newErrors.tanggalSelesai = 'Wajib diisi';
     return newErrors;
+  };
+
+  const handleInputChange = <K extends keyof FormState>(
+    key: K,
+    value: FormState[K]
+  ) => {
+    setForm((prev) => ({ ...prev, [key]: value }));
+    setErrors((prev) => ({ ...prev, [key]: '' }));
   };
 
   const handleSubmit = () => {
@@ -71,11 +95,6 @@ export default function PengajuanBaruPage() {
       setLoading(false);
       setIsModalVisible(true);
     }, 1200);
-  };
-
-  const handleInputChange = (key: string, value: any) => {
-    setForm((prev) => ({ ...prev, [key]: value }));
-    setErrors((prev) => ({ ...prev, [key]: '' }));
   };
 
   const handleModalOk = () => {
@@ -97,20 +116,30 @@ export default function PengajuanBaruPage() {
             <Title level={2}>Pengajuan Kontrak Baru</Title>
             <Divider />
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1 }}
+            >
               <Title level={4}>1. Informasi Umum</Title>
-              <Space direction="vertical" style={{ width: '100%' }} size="large">
-                {[
-                  { label: 'Nama Pekerjaan *', field: 'namaPekerjaan', type: 'input' },
-                  { label: 'Direksi Pekerjaan *', field: 'direksi', type: 'input' },
-                  { label: 'Pengawas Pekerjaan *', field: 'pengawas', type: 'input' },
-                  { label: 'Nomor Kontrak *', field: 'nomorKontrak', type: 'input' },
-                ].map(({ label, field }) => (
+              <Space
+                direction="vertical"
+                style={{ width: '100%' }}
+                size="large"
+              >
+                {(
+                  [
+                    { label: 'Nama Pekerjaan *', field: 'namaPekerjaan' },
+                    { label: 'Direksi Pekerjaan *', field: 'direksi' },
+                    { label: 'Pengawas Pekerjaan *', field: 'pengawas' },
+                    { label: 'Nomor Kontrak *', field: 'nomorKontrak' },
+                  ] as const
+                ).map(({ label, field }) => (
                   <motion.div key={field} layout>
                     <Text>{label}</Text>
                     <Input
                       placeholder="Input Chars"
-                      value={form[field as keyof typeof form] as string}
+                      value={form[field]}
                       onChange={(e) => handleInputChange(field, e.target.value)}
                       status={errors[field] ? 'error' : ''}
                     />
@@ -126,7 +155,9 @@ export default function PengajuanBaruPage() {
                     status={errors.tipePekerjaan ? 'error' : ''}
                     style={{ width: '100%' }}
                   >
-                    <Option value="change">Pengembangan / Change Request</Option>
+                    <Option value="change">
+                      Pengembangan / Change Request
+                    </Option>
                     <Option value="ophar">Pemeliharaan / Ophar</Option>
                   </Select>
                 </div>
@@ -140,12 +171,20 @@ export default function PengajuanBaruPage() {
                     status={errors.vendor ? 'error' : ''}
                     style={{ width: '100%' }}
                   >
-                    <Option value="akhdani">PT Akhdani Reka Solusi (Akhdani)</Option>
+                    <Option value="akhdani">
+                      PT Akhdani Reka Solusi (Akhdani)
+                    </Option>
                     <Option value="pds">PT Prima Data Semesta (PDS)</Option>
-                    <Option value="iglo">PT Indocyber Global Teknologi (IGLO)</Option>
-                    <Option value="webcenter">PT Webcenter Sentra Solusindo</Option>
+                    <Option value="iglo">
+                      PT Indocyber Global Teknologi (IGLO)
+                    </Option>
+                    <Option value="webcenter">
+                      PT Webcenter Sentra Solusindo
+                    </Option>
                     <Option value="ddn">PT Duta Digital Nusantara (DDN)</Option>
-                    <Option value="bangunindo">PT Bangunindo Tekunsa Jaya</Option>
+                    <Option value="bangunindo">
+                      PT Bangunindo Tekunsa Jaya
+                    </Option>
                     <Option value="ecomindo">PT Ecomindo Saranacipta</Option>
                   </Select>
                 </div>
@@ -155,7 +194,7 @@ export default function PengajuanBaruPage() {
                   <InputNumber
                     style={{ width: '100%' }}
                     placeholder="Input Number"
-                    value={form.nilai}
+                    value={form.nilai ?? undefined}
                     onChange={(val) => handleInputChange('nilai', val)}
                     status={errors.nilai ? 'error' : ''}
                   />
@@ -169,7 +208,9 @@ export default function PengajuanBaruPage() {
                     onChange={(date) => handleInputChange('tanggalMulai', date)}
                     status={errors.tanggalMulai ? 'error' : ''}
                     disabledDate={(current) =>
-                      form.tanggalSelesai ? current && current.isAfter(form.tanggalSelesai) : false
+                      form.tanggalSelesai
+                        ? current && current.isAfter(form.tanggalSelesai)
+                        : false
                     }
                   />
                 </div>
@@ -179,10 +220,14 @@ export default function PengajuanBaruPage() {
                   <DatePicker
                     style={{ width: '100%' }}
                     value={form.tanggalSelesai}
-                    onChange={(date) => handleInputChange('tanggalSelesai', date)}
+                    onChange={(date) =>
+                      handleInputChange('tanggalSelesai', date)
+                    }
                     status={errors.tanggalSelesai ? 'error' : ''}
                     disabledDate={(current) =>
-                      form.tanggalMulai ? current && current.isBefore(form.tanggalMulai) : false
+                      form.tanggalMulai
+                        ? current && current.isBefore(form.tanggalMulai)
+                        : false
                     }
                   />
                 </div>
@@ -191,7 +236,11 @@ export default function PengajuanBaruPage() {
 
             <Divider />
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
               <Title level={4}>2. Termin Pembayaran</Title>
               <Radio.Group
                 onChange={(e) => setTerminType(e.target.value)}
@@ -204,7 +253,7 @@ export default function PengajuanBaruPage() {
 
               {terminType === 'milestone' ? (
                 <>
-                  <p>Imput Jumlah Termin (1–12)</p>
+                  <p>Input Jumlah Termin (1–12)</p>
                   <InputNumber
                     min={1}
                     max={10}
@@ -215,7 +264,7 @@ export default function PengajuanBaruPage() {
                 </>
               ) : (
                 <>
-                  <p>Input Tanggal Pembayaran Rutin (1-30)</p>
+                  <p>Input Tanggal Pembayaran Rutin (1–30)</p>
                   <InputNumber
                     style={{ width: '100%' }}
                     value={milestoneCount}
@@ -227,7 +276,11 @@ export default function PengajuanBaruPage() {
 
             <Divider />
 
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
               <Title level={4}>3. Dokumen Administrasi</Title>
               <Upload.Dragger
                 multiple
@@ -238,8 +291,12 @@ export default function PengajuanBaruPage() {
                 <p className="ant-upload-drag-icon">
                   <InboxOutlined />
                 </p>
-                <p className="ant-upload-text">Klik atau drag file ke area ini untuk mengunggah</p>
-                <p className="ant-upload-hint">Bisa unggah beberapa file sekaligus</p>
+                <p className="ant-upload-text">
+                  Klik atau drag file ke area ini untuk mengunggah
+                </p>
+                <p className="ant-upload-hint">
+                  Bisa unggah beberapa file sekaligus
+                </p>
               </Upload.Dragger>
             </motion.div>
 
@@ -272,7 +329,9 @@ export default function PengajuanBaruPage() {
               status="success"
               title="Kontrak Berhasil Diajukan!"
               subTitle="Pengajuan kontrak berhasil dikirim dan sedang diproses."
-              icon={<CheckCircleOutlined style={{ color: 'green', fontSize: 64 }} />}
+              icon={
+                <CheckCircleOutlined style={{ color: 'green', fontSize: 64 }} />
+              }
               extra={[
                 <Button type="primary" key="ok" onClick={handleModalOk}>
                   Kembali ke Daftar Kontrak
