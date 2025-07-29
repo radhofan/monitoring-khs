@@ -3,7 +3,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "test": "echo \"No tests defined\" && exit 0"
   },
   "dependencies": {
     "antd": "^5.26.6",
