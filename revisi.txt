@@ -15,4 +15,7 @@
 10. termin amandemen kontrak?                                                  
 11. eslint errors                                                              # DONE
 12. organic design
-13. ci github actions
+13. ci github actions                                                          # DONE
+14. vitest
+15. authentication
+16. rbac view

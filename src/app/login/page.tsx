@@ -9,13 +9,27 @@ export default function LoginPage() {
   const router = useRouter();
 
   type LoginFormValues = {
-    username: string;
+    email: string;
     password: string;
   };
 
-  const onFinish = (values: LoginFormValues) => {
-    console.log('Login values:', values);
-    router.push('/');
+  const onFinish = async (values: LoginFormValues) => {
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      });
+
+      if (res.ok) {
+        router.push('/');
+      } else {
+        const data = await res.json();
+        console.error('Login error:', data.error);
+      }
+    } catch (err) {
+      console.error('Network error:', err);
+    }
   };
 
   return (
@@ -33,11 +47,11 @@ export default function LoginPage() {
       </Title>
       <Form name="login" layout="vertical" onFinish={onFinish}>
         <Form.Item
-          label="Username"
-          name="username"
-          rules={[{ required: true, message: 'Please enter your username!' }]}
+          label="Email"
+          name="email"
+          rules={[{ required: true, message: 'Please enter your email!' }]}
         >
-          <Input placeholder="Enter your username" />
+          <Input type="email" placeholder="Enter your email" />
         </Form.Item>
 
         <Form.Item
