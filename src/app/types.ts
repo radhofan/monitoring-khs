@@ -45,3 +45,8 @@ export type SuratPeringatan = {
   tanggal: string;
   alasan: string;
 };
+
+export interface User {
+  id: string;
+  role: 'admin' | 'guest';
+}

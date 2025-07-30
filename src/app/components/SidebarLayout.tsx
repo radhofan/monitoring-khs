@@ -12,6 +12,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
+import Logout from './Logout';
 
 const { Sider, Header, Content, Footer } = Layout;
 
@@ -93,7 +94,7 @@ export default function SidebarLayout({
         <div style={{ padding: 16, color: '#fff' }}>
           {!collapsed && (
             <>
-              <div style={{ marginBottom: '390%' }}></div>
+              <div style={{ marginBottom: '370%' }}></div>
               <div
                 style={{
                   display: 'flex',
@@ -129,6 +130,7 @@ export default function SidebarLayout({
                 <ApartmentOutlined />
                 <span style={{ fontSize: 14 }}>Bidang Perencanaan</span>
               </div>
+              <Logout />
             </>
           )}
         </div>

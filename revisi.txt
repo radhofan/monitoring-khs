@@ -8,7 +8,7 @@
    Case susah: - filter vendor                                                 # DONE
    Case susah: - filter kontrak                                                # DONE
 
-6. CSS                                                                         # DONE
+6. CSS                                                                         
 7. Animation                                                                   # DONE 
 8. fix github                                                                  # DONE
 9. filter kontrak / vendor                                                     # DONE
@@ -17,5 +17,5 @@
 12. organic design
 13. ci github actions                                                          # DONE
 14. vitest
-15. authentication
+15. authentication                                                             # DONE
 16. rbac view

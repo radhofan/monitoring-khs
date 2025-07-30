@@ -1,12 +1,13 @@
 'use client';
-
-import { Button, Form, Input, Typography } from 'antd';
+import { Button, Form, Input, Typography, message } from 'antd';
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 const { Title } = Typography;
 
 export default function LoginPage() {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
 
   type LoginFormValues = {
     email: string;
@@ -14,6 +15,7 @@ export default function LoginPage() {
   };
 
   const onFinish = async (values: LoginFormValues) => {
+    setLoading(true);
     try {
       const res = await fetch('/api/login', {
         method: 'POST',
@@ -21,14 +23,19 @@ export default function LoginPage() {
         body: JSON.stringify(values),
       });
 
+      const data = await res.json();
+
       if (res.ok) {
+        message.success('Login successful!');
         router.push('/');
       } else {
-        const data = await res.json();
-        console.error('Login error:', data.error);
+        message.error(data.error || 'Login failed');
       }
     } catch (err) {
       console.error('Network error:', err);
+      message.error('Network error. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -49,11 +56,13 @@ export default function LoginPage() {
         <Form.Item
           label="Email"
           name="email"
-          rules={[{ required: true, message: 'Please enter your email!' }]}
+          rules={[
+            { required: true, message: 'Please enter your email!' },
+            { type: 'email', message: 'Please enter a valid email!' },
+          ]}
         >
           <Input type="email" placeholder="Enter your email" />
         </Form.Item>
-
         <Form.Item
           label="Password"
           name="password"
@@ -61,9 +70,8 @@ export default function LoginPage() {
         >
           <Input.Password placeholder="Enter your password" />
         </Form.Item>
-
         <Form.Item>
-          <Button type="primary" htmlType="submit" block>
+          <Button type="primary" htmlType="submit" block loading={loading}>
             Log In
           </Button>
         </Form.Item>
