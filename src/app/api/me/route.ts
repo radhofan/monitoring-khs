@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       id: payload.id,
-      role: payload.role,
+      name: payload.name,
+      email: payload.email,
+      bidang: payload.bidang,
+      subBidang: payload.subBidang,
     });
   } catch (error) {
     console.error('JWT verification failed:', error);

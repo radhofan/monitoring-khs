@@ -18,4 +18,5 @@
 13. ci github actions                                                          # DONE
 14. vitest
 15. authentication                                                             # DONE
-16. rbac view
+16. rbac logic                                                                 # DONE
+17. rbac view                                                                  

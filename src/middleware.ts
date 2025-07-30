@@ -22,16 +22,10 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
 
-  if (token) {
-    try {
-      const { payload } = await jwtVerify(token, JWT_SECRET);
-      console.log('Token payload:', payload);
-      console.log('User ID:', payload.id);
-      console.log('User Role:', payload.role);
-    } catch (err) {
-      console.log(err, 'salah');
-      return NextResponse.redirect(new URL('/login', req.url));
-    }
+  try {
+    await jwtVerify(token, JWT_SECRET);
+  } catch {
+    return NextResponse.redirect(new URL('/login', req.url));
   }
 
   return NextResponse.next();

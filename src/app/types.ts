@@ -46,7 +46,15 @@ export type SuratPeringatan = {
   alasan: string;
 };
 
+// export interface User {
+//   id: string;
+//   role: 'admin' | 'guest';
+// }
+
 export interface User {
   id: string;
-  role: 'admin' | 'guest';
+  name: string;
+  email: string;
+  bidang: 'admin' | 'guest';
+  subBidang: string;
 }

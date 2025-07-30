@@ -8,20 +8,34 @@ const COOKIE_NAME = 'token';
 const users = [
   {
     id: '1',
+    name: 'Admin',
     email: 'admin@example.com',
-    role: 'admin',
+    bidang: 'Manajemen',
+    subBidang: 'Super Admin',
     passwordHash: bcrypt.hashSync('admin123', 10),
   },
   {
     id: '2',
+    name: 'Guest',
     email: 'guest@example.com',
-    role: 'guest',
+    bidang: 'Tamu',
+    subBidang: 'Umum',
     passwordHash: bcrypt.hashSync('guest123', 10),
   },
   {
     id: '3',
+    name: 'Radhofan',
     email: 'radhofanazizi@gmail.com',
-    role: 'admin',
+    bidang: 'Bidang Perencanaan',
+    subBidang: 'Bidang 1',
+    passwordHash: bcrypt.hashSync('password', 10),
+  },
+  {
+    id: '4',
+    name: 'Radhofan',
+    email: 'radhofanazizi@gmail.com',
+    bidang: 'Bidang Perencanaan',
+    subBidang: 'Bidang 1',
     passwordHash: bcrypt.hashSync('password', 10),
   },
 ];
@@ -55,9 +69,19 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     }
 
     // STEP 3
-    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, {
-      expiresIn: '7d',
-    });
+    const token = jwt.sign(
+      {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        bidang: user.bidang,
+        subBidang: user.subBidang,
+      },
+      JWT_SECRET,
+      {
+        expiresIn: '7d',
+      }
+    );
 
     // STEP 4 & 5
     const response = NextResponse.json({

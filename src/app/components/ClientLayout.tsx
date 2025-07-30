@@ -4,6 +4,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Spin } from 'antd';
 import SidebarLayout from '@/app/components/SidebarLayout';
+import AuthBootstrapper from './AuthBootstrapper';
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const [isReady, setIsReady] = useState(false);
@@ -32,5 +33,10 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  return <SidebarLayout>{children}</SidebarLayout>;
+  return (
+    <>
+      <AuthBootstrapper />
+      <SidebarLayout>{children}</SidebarLayout>
+    </>
+  );
 }

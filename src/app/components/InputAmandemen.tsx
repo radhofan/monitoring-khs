@@ -140,8 +140,18 @@ export default function InputAmandemenModal({
             />
           </Form.Item>
 
-          <Form.Item name="perubahanTermin" label="Perubahan Termin">
-            <Input />
+          <Form.Item label="Perubahan Termin">
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Input
+                disabled
+                value="3"
+                style={{ flex: 1 }}
+                placeholder="Jumlah termin sebelumnya"
+              />
+              <Form.Item name="perubahanTermin" noStyle>
+                <Input style={{ flex: 1 }} placeholder="Jumlah termin baru" />
+              </Form.Item>
+            </div>
           </Form.Item>
 
           <Form.Item

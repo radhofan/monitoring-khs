@@ -1,29 +1,14 @@
-// app/dashboard/page.tsx
 'use client';
-import { useEffect, useState } from 'react';
-import { User } from '@/app/types';
+import { useStore } from 'zustand';
+import { authStore } from '@/stores/useAuthStore';
 
-export default function Me() {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetch('/api/me')
-      .then((res) => res.json())
-      .then((data: User) => {
-        setUser(data);
-        setLoading(false);
-      });
-  }, []);
-
-  if (loading) return <div>Loading...</div>;
+export default function Example() {
+  const user = useStore(authStore, (s) => s.user);
 
   return (
-    <div>
-      <h1>Dashboard</h1>
-      {user?.role === 'admin' && <button>Delete Users (Admin Only)</button>}
-      {user?.role === 'guest' && <p>Welcome Guest! Limited access.</p>}
-      <p>Your role: {user?.role}</p>
-    </div>
+    <>
+      <div>{user ? `${user.name}` : 'Not Logged in'}</div>
+      <div>{user ? `${user.bidang}` : 'Not Logged in'}</div>
+    </>
   );
 }

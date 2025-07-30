@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Button, Modal, message } from 'antd';
 import { LogoutOutlined } from '@ant-design/icons';
 import { useRouter } from 'next/navigation';
+import { authStore } from '@/stores/useAuthStore';
 
 export default function Logout() {
   const [open, setOpen] = useState(false);
@@ -18,11 +19,9 @@ export default function Logout() {
 
       if (!res.ok) throw new Error('Logout failed');
 
+      authStore.getState().logout();
       message.success('Logged out successfully');
       setOpen(false);
-
-      // Optional: clear auth state here (e.g. Zustand)
-
       router.push('/login');
     } catch (err) {
       console.error('Logout error:', err);
