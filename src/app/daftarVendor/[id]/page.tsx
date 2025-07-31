@@ -18,7 +18,7 @@ import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 import type { ColumnType } from 'antd/es/table';
-import { Kontrak, AmandemenKontrak, SuratPeringatan } from '@/app/types';
+import { Kontrak, AmandemenKontrak, SuratPeringatan } from '@/types/Data';
 import ViewPembayaranModal from '@/app/components/ViewPembayaran';
 import EvaluasiVendorModal from '@/app/components/EvaluasiVendor';
 import InputAmandemenModal from '@/app/components/InputAmandemen';

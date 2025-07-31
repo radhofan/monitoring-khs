@@ -10,7 +10,7 @@ import { motion } from 'framer-motion';
 
 const { Title } = Typography;
 
-import type { Vendor } from '@/app/types';
+import type { Vendor } from '@/types/Data';
 
 const data: Vendor[] = [
   {

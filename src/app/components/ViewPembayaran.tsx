@@ -12,7 +12,7 @@ import {
   message,
   Result,
 } from 'antd';
-import { Kontrak } from '@/app/types';
+import { Kontrak } from '@/types/Data';
 import {
   FileOutlined,
   InboxOutlined,

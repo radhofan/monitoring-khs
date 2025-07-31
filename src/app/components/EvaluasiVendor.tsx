@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Modal, Form, Select, Button, Row, Col, Result } from 'antd';
-import { Kontrak } from '@/app/types';
+import { Kontrak } from '@/types/Data';
 import { CheckCircleOutlined } from '@ant-design/icons';
 
 const { Option } = Select;

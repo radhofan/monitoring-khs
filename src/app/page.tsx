@@ -6,11 +6,12 @@ import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 import type { ColumnType } from 'antd/es/table';
-import { Kontrak } from '@/app/types';
+import { Kontrak } from '@/types/Data';
 import ViewPembayaranModal from '@/app/components/ViewPembayaran';
 import EvaluasiVendorModal from '@/app/components/EvaluasiVendor';
 import DataDashboard from '@/app/components/DataDashboard';
 import { motion, AnimatePresence } from 'framer-motion';
+import { formatNumToRupiah } from '@/lib/currency';
 
 const { Title } = Typography;
 
@@ -161,14 +162,6 @@ export default function DaftarKontrakPage() {
     setShowModal(true);
   };
 
-  const formatRupiah = (number: number): string => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-    }).format(number);
-  };
-
   const getColumnSearchProps = (
     dataIndex: keyof Kontrak
   ): ColumnType<Kontrak> => {
@@ -300,7 +293,7 @@ export default function DaftarKontrakPage() {
       key: 'nilaiTotal',
       sorter: (a, b) => a.nilaiTotal - b.nilaiTotal,
       render: (value: number) => (
-        <span style={{ color: '#389e0d' }}>{formatRupiah(value)}</span>
+        <span style={{ color: '#389e0d' }}>{formatNumToRupiah(value)}</span>
       ),
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),

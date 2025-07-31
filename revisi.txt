@@ -12,7 +12,7 @@
 7. Animation                                                                   # DONE 
 8. fix github                                                                  # DONE
 9. filter kontrak / vendor                                                     # DONE
-10. termin amandemen kontrak?                                                  
+10. termin amandemen kontrak?                                                  # DONE
 11. eslint errors                                                              # DONE
 12. organic design
 13. ci github actions                                                          # DONE
@@ -20,3 +20,5 @@
 15. authentication                                                             # DONE
 16. rbac logic                                                                 # DONE
 17. rbac view                                                                  
+18. input validation
+19. auth.ts                                                                    # DONE
