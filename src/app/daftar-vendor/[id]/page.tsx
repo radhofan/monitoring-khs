@@ -147,7 +147,7 @@ export default function DaftarVendorDetailPage() {
       dataIndex: 'tipePekerjaan',
       key: 'tipePekerjaan',
       filters: Array.from(
-        new Set(kontrak.map((item) => item.tipePekerjaan))
+        new Set(kontrak.map((item: Kontrak) => item.tipePekerjaan))
       ).map((type) => ({ text: type, value: type })),
       onFilter: (value, record) => record.tipePekerjaan === value,
       render: (tipe) => (
@@ -236,7 +236,7 @@ export default function DaftarVendorDetailPage() {
       key: 'infoStatusPembayaran',
       width: 220,
       filters: Array.from(
-        new Set(kontrak.map((item) => item.infoStatusPembayaran))
+        new Set(kontrak.map((item: Kontrak) => item.infoStatusPembayaran))
       ).map((type) => ({ text: type, value: type })),
       onFilter: (value, record) => record.infoStatusPembayaran === value,
       render: (_, record) => (
@@ -381,11 +381,11 @@ export default function DaftarVendorDetailPage() {
 
         <Card style={{ marginBottom: 24 }}>
           <Title level={3}>Daftar Kontrak</Title>
-          <Table
+          <Table<Kontrak>
             dataSource={
               user?.subBidang
                 ? filteredKontrak.filter(
-                    (item) => item.subBidang === user.subBidang
+                    (item: Kontrak) => item.subBidang === user.subBidang
                   )
                 : filteredKontrak
             }

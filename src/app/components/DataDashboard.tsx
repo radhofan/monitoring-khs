@@ -59,6 +59,7 @@ export default function DataDashboard() {
               }}
             >
               <Tag color="green">Terbayar Semua: {kontrakTerbayar}</Tag>
+              <Tag color="orange">Terbayar Sebagian: {kontrakTerbayar}</Tag>
               <Tag color="red">
                 Belum Terbayar Semua: {kontrakBelumTerbayar}
               </Tag>
