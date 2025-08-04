@@ -1,5 +1,5 @@
 import { createStore } from 'zustand/vanilla';
-import { User } from '@/types/Data';
+import { User } from '@/types/types';
 
 type AuthState = {
   user: User | null;

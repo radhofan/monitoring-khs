@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { jwtVerify, JWTPayload } from 'jose';
 import { NextRequest, NextResponse } from 'next/server';
-import { User } from '@/types/Data';
+import { User } from '@/types/types';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-dev';
 const JWT_SECRET_BUFFER = new TextEncoder().encode(JWT_SECRET);

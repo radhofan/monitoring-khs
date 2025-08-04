@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   Table,
   Typography,
@@ -18,71 +18,28 @@ import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 import type { ColumnType } from 'antd/es/table';
-import { Kontrak, AmandemenKontrak, SuratPeringatan } from '@/types/Data';
+import { Kontrak, AmandemenKontrak, SuratPeringatan } from '@/types/types';
 import ViewPembayaranModal from '@/app/components/ViewPembayaran';
 import EvaluasiVendorModal from '@/app/components/EvaluasiVendor';
 import InputAmandemenModal from '@/app/components/InputAmandemen';
 import InputSuratPeringatanModal from '@/app/components/InputSuratPeringatan';
 import { motion, AnimatePresence } from 'framer-motion';
+import { kontrak, vendor } from '@/types/data';
+import { useStore } from 'zustand';
+import { authStore } from '@/stores/useAuthStore';
 
 const { Title, Text } = Typography;
 
-const data: Kontrak[] = [
-  {
-    key: '1',
-    namaPekerjaan: 'Implementasi e-Document Management System',
-    tipePekerjaan: 'Pengembangan / Change Request',
-    direksiPekerjaan: 'Ahmad Fauzi',
-    pengawasPekerjaan: 'Nina Rachmawati',
-    vendorKHS: 'PT Akhdani Reka Solusi (Akhdani)',
-    nilaiTotal: 2000000000,
-    nomorKontrak: 'K-A1312',
-    nomorAmandemenKontrak: '-',
-    tanggalMulai: '05/01/2024',
-    tanggalSelesai: '30/06/2024',
-    terminPembayaran: 'Termin 3',
-    infoStatusPembayaran: 'Terbayar Semua',
-    dataStatusPembayaran: {
-      1: { status: 'Terbayar', dokumen: ['kwitansi1.pdf'] },
-      2: { status: 'Terbayar', dokumen: ['kwitansi2.pdf'] },
-      3: { status: 'Terbayar', dokumen: ['kwitansi3.pdf'] },
-    },
-  },
-];
-
-const amandemenData: AmandemenKontrak[] = [
-  {
-    key: 'A1',
-    nomorAmandemen: 'AM-2024-01',
-    tanggal: '01/03/2024',
-    deskripsi: 'Penambahan fitur dokumen OCR dan indexing otomatis.',
-  },
-  {
-    key: 'A2',
-    nomorAmandemen: 'AM-2024-02',
-    tanggal: '15/04/2024',
-    deskripsi: 'Perubahan jadwal implementasi modul approval.',
-  },
-];
-
-const peringatanData: SuratPeringatan[] = [
-  {
-    key: 'SP1',
-    nomor: 'SP-2024-01',
-    tanggal: '10/05/2024',
-    alasan: 'Keterlambatan penyampaian laporan mingguan.',
-  },
-  {
-    key: 'SP2',
-    nomor: 'SP-2024-02',
-    tanggal: '25/06/2024',
-    alasan: 'Kualitas deliverable tidak sesuai spesifikasi.',
-  },
-];
-
 export default function DaftarVendorDetailPage() {
-  // const params = useParams();
-  // const id = params.id;
+  const params = useParams();
+  const id = params.id;
+  const filteredKontrak = kontrak.filter((k) => k.vendorKey === id);
+  const filteredVendor = vendor.filter((k) => k.key === id);
+  const peringatanData = filteredVendor[0].suratPeringatanDetail;
+  const amandemenData = filteredKontrak
+    .map((k) => k.amandemenKontrakDetail)
+    .filter((a) => !!a);
+  const user = useStore(authStore, (s) => s.user);
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
   const [showEvaluasiModal, setShowEvaluasiModal] = useState(false);
@@ -189,9 +146,9 @@ export default function DaftarVendorDetailPage() {
       title: 'Tipe Pekerjaan',
       dataIndex: 'tipePekerjaan',
       key: 'tipePekerjaan',
-      filters: Array.from(new Set(data.map((item) => item.tipePekerjaan))).map(
-        (type) => ({ text: type, value: type })
-      ),
+      filters: Array.from(
+        new Set(kontrak.map((item) => item.tipePekerjaan))
+      ).map((type) => ({ text: type, value: type })),
       onFilter: (value, record) => record.tipePekerjaan === value,
       render: (tipe) => (
         <Tag color={tipe.includes('Pengembangan') ? 'geekblue' : 'volcano'}>
@@ -279,7 +236,7 @@ export default function DaftarVendorDetailPage() {
       key: 'infoStatusPembayaran',
       width: 220,
       filters: Array.from(
-        new Set(data.map((item) => item.infoStatusPembayaran))
+        new Set(kontrak.map((item) => item.infoStatusPembayaran))
       ).map((type) => ({ text: type, value: type })),
       onFilter: (value, record) => record.infoStatusPembayaran === value,
       render: (_, record) => (
@@ -308,7 +265,7 @@ export default function DaftarVendorDetailPage() {
     {
       title: 'Evaluasi Pembayaran',
       key: 'evaluasiPembayaran',
-      render: (_, record) => (
+      render: (_: Kontrak, record: Kontrak) => (
         <Button
           type="primary"
           onClick={() => {
@@ -319,7 +276,7 @@ export default function DaftarVendorDetailPage() {
           }}
           disabled={record.infoStatusPembayaran !== 'Terbayar Semua'}
         >
-          Evaluasi
+          {record.infoEvaluasi === 'Selesai' ? 'Selesai Evaluasi' : 'Evaluasi'}
         </Button>
       ),
       onHeaderCell: () => ({ style: headerStyle }),
@@ -332,6 +289,13 @@ export default function DaftarVendorDetailPage() {
       title: 'Nomor Amandemen',
       dataIndex: 'nomorAmandemen',
       key: 'nomorAmandemen',
+      onHeaderCell: () => ({ style: headerStyle }),
+      onCell: () => ({ style: cellStyle }),
+    },
+    {
+      title: 'Nomor Kontrak',
+      dataIndex: 'nomorKontrak',
+      key: 'nomorKontrak',
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
     },
@@ -405,12 +369,12 @@ export default function DaftarVendorDetailPage() {
               />
             </Col>
             <Col>
-              <Title level={4}>PT Akhdani Reka Solusi (Akhdani)</Title>
+              <Title level={4}>{filteredVendor[0].namaVendor}</Title>
               <Text>📍 Jl. Contoh Alamat No.123, Jakarta Selatan</Text>
               <br />
               <Text>📞 (021) 123-4567</Text>
               <br />
-              <Text>✉️ info@akhdani.com</Text>
+              <Text>✉️ email@vendor.com</Text>
             </Col>
           </Row>
         </Card>
@@ -418,7 +382,13 @@ export default function DaftarVendorDetailPage() {
         <Card style={{ marginBottom: 24 }}>
           <Title level={3}>Daftar Kontrak</Title>
           <Table
-            dataSource={data}
+            dataSource={
+              user?.subBidang
+                ? filteredKontrak.filter(
+                    (item) => item.subBidang === user.subBidang
+                  )
+                : filteredKontrak
+            }
             columns={columns}
             pagination={{ pageSize: 5 }}
             bordered
@@ -505,6 +475,7 @@ export default function DaftarVendorDetailPage() {
             <InputAmandemenModal
               visible={showInputAmandemenModal}
               onClose={() => setShowInputAmandemenModal(false)}
+              kontrak={filteredKontrak}
             />
           </motion.div>
         )}

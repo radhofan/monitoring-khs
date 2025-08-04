@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Modal, Form, Select, Button, Row, Col, Result } from 'antd';
-import { Kontrak } from '@/types/Data';
+import { Kontrak } from '@/types/types';
 import { CheckCircleOutlined } from '@ant-design/icons';
 
 const { Option } = Select;
@@ -76,7 +76,15 @@ export default function EvaluasiVendorModal({
               label="1. Ketepatan Waktu (40%)"
               rules={[{ required: true, message: 'Harap pilih nilai.' }]}
             >
-              <Select placeholder="Pilih nilai ketepatan waktu">
+              <Select
+                placeholder={
+                  data.infoEvaluasi === 'Selesai'
+                    ? '95 - Sesuai jadwal (disabled)'
+                    : 'Pilih nilai ketepatan waktu'
+                }
+                disabled={data.infoEvaluasi === 'Selesai'}
+                defaultValue={data.infoEvaluasi === 'Selesai' ? 95 : undefined}
+              >
                 <Option value={100}>100 - Selesai lebih cepat</Option>
                 <Option value={95}>95 - Sesuai jadwal</Option>
                 <Option value={65}>65 - Terlambat ≤ 10%</Option>
@@ -90,7 +98,15 @@ export default function EvaluasiVendorModal({
               label="2. Kualitas Pekerjaan (30%)"
               rules={[{ required: true, message: 'Harap pilih nilai.' }]}
             >
-              <Select placeholder="Pilih nilai kualitas pekerjaan">
+              <Select
+                placeholder={
+                  data.infoEvaluasi === 'Selesai'
+                    ? '80 – Baik (disabled)'
+                    : 'Pilih nilai kualitas pekerjaan'
+                }
+                disabled={data.infoEvaluasi === 'Selesai'}
+                defaultValue={data.infoEvaluasi === 'Selesai' ? 80 : undefined}
+              >
                 <Option value={100}>
                   100 – Sesuai ekspektasi, tidak ada temuan major
                 </Option>
@@ -109,7 +125,15 @@ export default function EvaluasiVendorModal({
               label="3. Komunikasi & Dokumentasi (30%)"
               rules={[{ required: true, message: 'Harap pilih nilai.' }]}
             >
-              <Select placeholder="Pilih nilai komunikasi & dokumentasi">
+              <Select
+                placeholder={
+                  data.infoEvaluasi === 'Selesai'
+                    ? '80 – Respons cepat (disabled)'
+                    : 'Pilih nilai komunikasi & dokumentasi'
+                }
+                disabled={data.infoEvaluasi === 'Selesai'}
+                defaultValue={data.infoEvaluasi === 'Selesai' ? 80 : undefined}
+              >
                 <Option value={100}>
                   100 – Respons sangat cepat, dokumen lengkap & rapi
                 </Option>
@@ -125,17 +149,19 @@ export default function EvaluasiVendorModal({
               </Select>
             </Form.Item>
 
-            <Row justify="end">
-              <Col>
-                <Button
-                  type="primary"
-                  icon={<CheckCircleOutlined />}
-                  onClick={handleSubmit}
-                >
-                  Submit
-                </Button>
-              </Col>
-            </Row>
+            {data.infoEvaluasi !== 'Selesai' && (
+              <Row justify="end">
+                <Col>
+                  <Button
+                    type="primary"
+                    icon={<CheckCircleOutlined />}
+                    onClick={handleSubmit}
+                  >
+                    Submit
+                  </Button>
+                </Col>
+              </Row>
+            )}
           </Form>
         </>
       )}

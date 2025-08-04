@@ -12,13 +12,15 @@ import {
   message,
   Result,
 } from 'antd';
-import { Kontrak } from '@/types/Data';
+import { Kontrak } from '@/types/types';
 import {
   FileOutlined,
   InboxOutlined,
   CheckCircleOutlined,
 } from '@ant-design/icons';
 import type { UploadFile, FormItemProps } from 'antd';
+// import { useStore } from 'zustand';
+// import { authStore } from '@/stores/useAuthStore';
 
 const { Step } = Steps;
 const { Paragraph, Text, Link } = Typography;
@@ -41,6 +43,7 @@ export default function ViewPembayaranModal({
   data,
   onClose,
 }: ViewPembayaranModalProps) {
+  // const user = useStore(authStore, (s) => s.user);
   const [form] = Form.useForm<PembayaranFormData>();
   const [uploading, setUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -150,6 +153,8 @@ export default function ViewPembayaranModal({
             ))}
           </Steps>
 
+          {/* {user?.bidang === 'Bidang Perencanaan' && (
+            <> */}
           <p>
             <strong>Input Pembayaran:</strong>
           </p>
@@ -204,6 +209,8 @@ export default function ViewPembayaranModal({
             </Form.Item>
           </Form>
         </>
+        // )}
+        // </>
       )}
     </Modal>
   );

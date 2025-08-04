@@ -10,24 +10,29 @@ import {
   InputNumber,
   Result,
   message,
+  Select,
 } from 'antd';
 import { UploadOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import type { UploadFile } from 'antd';
 import type { FormItemProps } from 'antd';
+import { Kontrak } from '@/types/types';
 
 type InputAmandemenModalProps = {
   visible: boolean;
   onClose: () => void;
+  kontrak: Kontrak[];
 };
 
 type AmandemenFormData = {
+  nomorKontrak: string;
   nomorAmandemen: string;
   perubahanKontrak: string;
   perubahanDireksi?: string;
   perubahanPengawas?: string;
   tanggalBerlaku: string;
   nilaiKontrak: number;
+  oldTermin?: number;
   perubahanTermin?: string;
   file: UploadFile[];
 };
@@ -35,6 +40,7 @@ type AmandemenFormData = {
 export default function InputAmandemenModal({
   visible,
   onClose,
+  kontrak,
 }: InputAmandemenModalProps) {
   const [form] = Form.useForm<AmandemenFormData>();
   const [loading, setLoading] = useState(false);
@@ -67,6 +73,11 @@ export default function InputAmandemenModal({
       title="Input Amandemen Kontrak"
       onCancel={handleClose}
       footer={null}
+      width={700}
+      bodyStyle={{
+        maxHeight: '70vh',
+        overflowY: 'auto',
+      }}
     >
       {submitted ? (
         <Result
@@ -84,6 +95,19 @@ export default function InputAmandemenModal({
         />
       ) : (
         <Form layout="vertical" form={form} onFinish={handleSubmit}>
+          <Form.Item
+            name="nomorKontrak"
+            label="Pilih Nomor Kontrak"
+            rules={[{ required: true, message: 'Mohon pilih nomor kontrak' }]}
+          >
+            <Select placeholder="Pilih nomor kontrak">
+              {kontrak.map((item) => (
+                <Select.Option key={item.key} value={item.nomorKontrak}>
+                  {item.nomorKontrak}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
           <Form.Item
             name="nomorAmandemen"
             label="Nomor Amandemen Kontrak"
@@ -142,14 +166,38 @@ export default function InputAmandemenModal({
 
           <Form.Item label="Perubahan Termin">
             <div style={{ display: 'flex', gap: 8 }}>
-              <Input
-                disabled
-                value="3"
-                style={{ flex: 1 }}
-                placeholder="Jumlah termin sebelumnya"
-              />
-              <Form.Item name="perubahanTermin" noStyle>
-                <Input style={{ flex: 1 }} placeholder="Jumlah termin baru" />
+              <Form.Item
+                name="oldTermin"
+                initialValue={3}
+                style={{ flex: 1, marginBottom: 0 }}
+              >
+                <Input disabled placeholder="Jumlah termin sebelumnya" />
+              </Form.Item>
+
+              <Form.Item
+                name="perubahanTermin"
+                style={{ flex: 1, marginBottom: 0 }}
+                rules={[
+                  { required: true, message: 'Mohon isi Jumlah Termin Baru' },
+                  {
+                    validator: (_, value) => {
+                      const oldValue = form.getFieldValue('oldTermin');
+                      if (value > oldValue) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error(
+                          'Jumlah termin baru harus lebih dari termin sebelumnya'
+                        )
+                      );
+                    },
+                  },
+                ]}
+              >
+                <InputNumber
+                  placeholder="Jumlah termin baru"
+                  style={{ width: '100%' }}
+                />
               </Form.Item>
             </div>
           </Form.Item>

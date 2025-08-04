@@ -23,5 +23,9 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL('/login', req.url));
   }
 
+  if (pathname === '/pengajuan-baru' && user.bidang !== 'Bidang Perencanaan') {
+    return NextResponse.redirect(new URL('/', req.url));
+  }
+
   return NextResponse.next();
 }

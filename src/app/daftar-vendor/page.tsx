@@ -7,53 +7,22 @@ import type { ColumnsType, ColumnType } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { vendor, kontrak } from '@/types/data';
+import { useStore } from 'zustand';
+import { authStore } from '@/stores/useAuthStore';
 
 const { Title } = Typography;
 
-import type { Vendor } from '@/types/Data';
-
-const data: Vendor[] = [
-  {
-    key: '1',
-    namaVendor: 'PT Akhdani Reka Solusi (Akhdani)',
-    nilaiKeseluruhan: 92,
-    evaluasiVendor: 4.6,
-    suratPeringatan: 'Tidak ada',
-    totalProyek: 12,
-  },
-  {
-    key: '2',
-    namaVendor: 'PT Indocyber Global Teknologi (IGLO)',
-    nilaiKeseluruhan: 80,
-    evaluasiVendor: 4.0,
-    suratPeringatan: 'Ada',
-    totalProyek: 8,
-  },
-  {
-    key: '3',
-    namaVendor: 'PT Duta Digital Nusantara (DDN)',
-    nilaiKeseluruhan: 85,
-    evaluasiVendor: 4.2,
-    suratPeringatan: 'Tidak ada',
-    totalProyek: 10,
-  },
-  {
-    key: '4',
-    namaVendor: 'PT Ecomindo Saranacipta (Ecomindo)',
-    nilaiKeseluruhan: 78,
-    evaluasiVendor: 3.9,
-    suratPeringatan: 'Ada',
-    totalProyek: 6,
-  },
-];
+import type { Vendor } from '@/types/types';
 
 export default function DaftarVendorPage() {
   const router = useRouter();
+  const user = useStore(authStore, (s) => s.user);
   const [, setSearchText] = useState('');
   const [, setSearchedColumn] = useState<keyof Vendor | ''>('');
 
   const handleClick = (record: Vendor) => {
-    router.push(`/daftarVendor/${record.key}`);
+    router.push(`/daftar-vendor/${record.key}`);
   };
 
   const getColumnSearchProps = (
@@ -263,10 +232,32 @@ export default function DaftarVendorPage() {
       onCell: () => ({ style: cellStyle }),
     },
     {
-      title: 'Total Proyek',
+      title: 'Total Proyek di STI',
       dataIndex: 'totalProyek',
       key: 'totalProyek',
       sorter: (a, b) => a.totalProyek - b.totalProyek,
+      ...getColumnSearchProps('totalProyek'),
+      onHeaderCell: () => ({ style: headerStyle }),
+      onCell: () => ({ style: cellStyle }),
+    },
+    {
+      title: 'Total Proyek di Bidang',
+      key: 'totalProyek',
+      render: (_, record) => {
+        const count = kontrak.filter(
+          (k) => k.vendorKey === record.key && k.subBidang === user?.subBidang
+        ).length;
+        return count;
+      },
+      sorter: (a, b) => {
+        const aCount = kontrak.filter(
+          (k) => k.vendorKey === a.key && k.subBidang === user?.subBidang
+        ).length;
+        const bCount = kontrak.filter(
+          (k) => k.vendorKey === b.key && k.subBidang === user?.subBidang
+        ).length;
+        return aCount - bCount;
+      },
       ...getColumnSearchProps('totalProyek'),
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
@@ -297,9 +288,9 @@ export default function DaftarVendorPage() {
           View Monitoring Vendor
         </Title>
         <Table
-          dataSource={data}
+          dataSource={vendor}
           columns={columns}
-          pagination={{ pageSize: 5 }}
+          pagination={{ pageSize: 8 }}
           bordered
           rowKey="key"
           scroll={{ x: true }}

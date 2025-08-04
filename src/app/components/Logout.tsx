@@ -8,6 +8,7 @@ import { authStore } from '@/stores/useAuthStore';
 
 export default function Logout() {
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const showModal = () => setOpen(true);
@@ -15,6 +16,7 @@ export default function Logout() {
 
   const handleLogout = async () => {
     try {
+      setLoading(true);
       const res = await fetch('/api/logout', { method: 'POST' });
 
       if (!res.ok) throw new Error('Logout failed');
@@ -26,16 +28,21 @@ export default function Logout() {
     } catch (err) {
       console.error('Logout error:', err);
       message.error('Logout failed');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <>
       <Button
-        type="primary"
-        danger
+        type="text"
         icon={<LogoutOutlined />}
         onClick={showModal}
+        style={{
+          color: '#fc0824ff',
+          paddingLeft: 0,
+        }}
       >
         Logout
       </Button>
@@ -44,6 +51,7 @@ export default function Logout() {
         title="Confirm Logout"
         open={open}
         onOk={handleLogout}
+        confirmLoading={loading}
         onCancel={handleCancel}
         okText="Logout"
         okButtonProps={{ danger: true }}

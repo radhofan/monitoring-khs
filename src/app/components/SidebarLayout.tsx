@@ -13,6 +13,8 @@ import {
 } from '@ant-design/icons';
 import { usePathname } from 'next/navigation';
 import Logout from './Logout';
+import { useStore } from 'zustand';
+import { authStore } from '@/stores/useAuthStore';
 
 const { Sider, Header, Content, Footer } = Layout;
 
@@ -21,13 +23,14 @@ export default function SidebarLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const user = useStore(authStore, (s) => s.user);
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
 
   const selectedKey = (() => {
     if (pathname === '/') return '1';
-    if (pathname.startsWith('/pengajuanBaru')) return '2';
-    if (pathname.startsWith('/daftarVendor')) return '3';
+    if (pathname.startsWith('/pengajuan-baru')) return '2';
+    if (pathname.startsWith('/daftar-vendor')) return '3';
     return '';
   })();
 
@@ -43,12 +46,10 @@ export default function SidebarLayout({
           position: 'fixed',
           left: 0,
           top: 0,
-          bottom: 0,
           display: 'flex',
           flexDirection: 'column',
         }}
       >
-        {/* Top: Logo + Menu */}
         <div style={{ flexGrow: 1 }}>
           <div
             style={{
@@ -71,68 +72,109 @@ export default function SidebarLayout({
             theme="dark"
             mode="inline"
             selectedKeys={[selectedKey]}
-            style={{ marginTop: 8 }}
-            items={[
-              {
-                key: '1',
-                icon: <FileTextOutlined />,
-                label: <Link href="/">Daftar Kontrak</Link>,
-              },
-              {
-                key: '2',
-                icon: <FileAddOutlined />,
-                label: <Link href="/pengajuanBaru">Pengajuan Baru</Link>,
-              },
-              {
-                key: '3',
-                icon: <TeamOutlined />,
-                label: <Link href="/daftarVendor">Daftar Vendor</Link>,
-              },
-            ]}
-          />
-        </div>
-        <div style={{ padding: 16, color: '#fff' }}>
-          {!collapsed && (
-            <>
-              <div style={{ marginBottom: '370%' }}></div>
-              <div
+            style={{
+              marginTop: 'auto',
+              flexGrow: 1,
+              position: 'relative',
+              paddingBottom: collapsed
+                ? 0
+                : user?.bidang === 'Bidang Perencanaan'
+                  ? 740
+                  : 790,
+            }}
+          >
+            <Menu.Item key="1" icon={<FileTextOutlined />}>
+              <Link href="/">Daftar Kontrak</Link>
+            </Menu.Item>
+            {user?.bidang === 'Bidang Perencanaan' && (
+              <Menu.Item key="2" icon={<FileAddOutlined />}>
+                <Link href="/pengajuan-baru">Pengajuan Baru</Link>
+              </Menu.Item>
+            )}
+            <Menu.Item key="3" icon={<TeamOutlined />}>
+              <Link href="/daftar-vendor">Daftar Vendor</Link>
+            </Menu.Item>
+
+            {!collapsed && (
+              <Menu.Item
+                key="user-info"
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  marginBottom: 8,
+                  marginTop: 'auto',
+                  position: 'absolute',
+                  bottom: 0,
+                  zIndex: 1,
+                  height: 'fit-content',
+                  color: '#ffffff',
                 }}
               >
-                <UserOutlined />
-                <span style={{ fontSize: 16, fontWeight: 'bold' }}>
-                  Radho Ramdhani
-                </span>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  marginBottom: 8,
-                }}
-              >
-                <MailOutlined />
-                <span style={{ fontSize: 14 }}>radho@email.com</span>
-              </div>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 8,
-                  marginBottom: 8,
-                }}
-              >
-                <ApartmentOutlined />
-                <span style={{ fontSize: 14 }}>Bidang Perencanaan</span>
-              </div>
-              <Logout />
-            </>
-          )}
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    marginBottom: 8,
+                  }}
+                >
+                  <UserOutlined />
+                  <span
+                    style={{
+                      fontSize: 14,
+                      wordBreak: 'break-word',
+                      whiteSpace: 'normal',
+                      display: 'block',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {user?.name || 'Radho Ramdhani'}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    marginBottom: 8,
+                  }}
+                >
+                  <MailOutlined />
+                  <span
+                    style={{
+                      fontSize: 14,
+                      wordBreak: 'break-word',
+                      whiteSpace: 'normal',
+                      display: 'block',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    {user?.email || 'Not Logged in'}
+                  </span>
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 2,
+                    marginBottom: 8,
+                  }}
+                >
+                  <ApartmentOutlined />
+                  <span
+                    style={{
+                      fontSize: 14,
+                      wordBreak: 'break-word',
+                      whiteSpace: 'normal',
+                      display: 'block',
+                      lineHeight: 1.2,
+                    }}
+                  >
+                    <div>{user?.bidang || 'Not Logged in'}</div>
+                    <div>{user?.subBidang || ''}</div>
+                  </span>
+                </div>
+                <Logout />
+              </Menu.Item>
+            )}
+          </Menu>
         </div>
       </Sider>
 
