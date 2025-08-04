@@ -153,7 +153,7 @@ export default function DaftarVendorDetailPage() {
       key: 'tipePekerjaan',
       filters: Array.from(
         new Set(kontrak.map((item: Kontrak) => item.tipePekerjaan))
-      ).map((type) => ({ text: type, value: type })),
+      ).map((type: string) => ({ text: type, value: type })),
       onFilter: (value, record) => record.tipePekerjaan === value,
       render: (tipe) => (
         <Tag color={tipe.includes('Pengembangan') ? 'geekblue' : 'volcano'}>
@@ -242,7 +242,7 @@ export default function DaftarVendorDetailPage() {
       width: 220,
       filters: Array.from(
         new Set(kontrak.map((item: Kontrak) => item.infoStatusPembayaran))
-      ).map((type) => ({ text: type, value: type })),
+      ).map((type: string) => ({ text: type, value: type })),
       onFilter: (value, record) => record.infoStatusPembayaran === value,
       render: (_, record) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
