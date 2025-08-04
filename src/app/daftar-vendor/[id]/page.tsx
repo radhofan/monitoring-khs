@@ -18,7 +18,12 @@ import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 import type { ColumnType } from 'antd/es/table';
-import { Kontrak, AmandemenKontrak, SuratPeringatan } from '@/types/types';
+import {
+  Kontrak,
+  AmandemenKontrak,
+  SuratPeringatan,
+  Vendor,
+} from '@/types/types';
 import ViewPembayaranModal from '@/app/components/ViewPembayaran';
 import EvaluasiVendorModal from '@/app/components/EvaluasiVendor';
 import InputAmandemenModal from '@/app/components/InputAmandemen';
@@ -33,8 +38,8 @@ const { Title, Text } = Typography;
 export default function DaftarVendorDetailPage() {
   const params = useParams();
   const id = params.id;
-  const filteredKontrak = kontrak.filter((k) => k.vendorKey === id);
-  const filteredVendor = vendor.filter((k) => k.key === id);
+  const filteredKontrak = kontrak.filter((k: Kontrak) => k.vendorKey === id);
+  const filteredVendor = vendor.filter((k: Vendor) => k.key === id);
   const peringatanData = filteredVendor[0].suratPeringatanDetail;
   const amandemenData = filteredKontrak
     .map((k) => k.amandemenKontrakDetail)
