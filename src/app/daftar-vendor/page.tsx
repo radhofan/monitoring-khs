@@ -7,7 +7,7 @@ import type { ColumnsType, ColumnType } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { vendor, kontrak } from '@/types/data';
+import { vendor, kontrak } from '@/types/dummy';
 import { useStore } from 'zustand';
 import { authStore } from '@/stores/useAuthStore';
 

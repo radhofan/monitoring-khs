@@ -29,7 +29,7 @@ import EvaluasiVendorModal from '@/app/components/EvaluasiVendor';
 import InputAmandemenModal from '@/app/components/InputAmandemen';
 import InputSuratPeringatanModal from '@/app/components/InputSuratPeringatan';
 import { motion, AnimatePresence } from 'framer-motion';
-import { kontrak, vendor } from '@/types/data';
+import { kontrak, vendor } from '@/types/dummy';
 import { useStore } from 'zustand';
 import { authStore } from '@/stores/useAuthStore';
 

@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { formatNumToRupiah } from '@/lib/currency';
 import { useStore } from 'zustand';
 import { authStore } from '@/stores/useAuthStore';
-import { kontrak } from '@/types/data';
+import { kontrak } from '@/types/dummy';
 
 const { Title } = Typography;
 
