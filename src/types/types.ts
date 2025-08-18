@@ -1,3 +1,4 @@
+///////////////////////////////////////////////////////////// MODEL TYPES
 export interface Kontrak {
   key: string;
   namaPekerjaan: string;
@@ -40,8 +41,7 @@ export interface User {
   subBidang: string;
 }
 
-/////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////// SUPPORT TYPES
 export interface TerminDetail {
   status: 'Terbayar' | 'Belum Terbayar';
   dokumen?: string[];

@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id        String @id @default(uuid())
+  name      String
+  email     String @unique
+  bidang    String
+  subBidang String?
+}
+
+model Vendor {
+  key                String   @id
+  namaVendor         String
+  nilaiKeseluruhan   Float
+  evaluasiVendor     Float
+  suratPeringatan    String
+  totalProyek        Int
+  suratPeringatanDetail Json? // array of SuratPeringatan objects
+  kontraks           Kontrak[]
+}
+
+model Kontrak {
+  key                       String   @id
+  namaPekerjaan             String
+  subBidang                 String
+  tipePekerjaan             String
+  direksiPekerjaan          String
+  pengawasPekerjaan         String
+  vendorKey                 String
+  vendorKHS                 String
+  nilaiTotal                Float
+  nomorKontrak              String
+  nomorAmandemenKontrak     String
+  amandemenKontrakDetail    Json? // AmandemenKontrak
+  tanggalMulai              DateTime
+  tanggalSelesai            DateTime
+  terminPembayaran          String
+  infoStatusPembayaran      String
+  dataStatusPembayaran      Json  // Record<number, TerminDetail>
+  infoEvaluasi              String
+  userId                    String
+  vendor                    Vendor @relation(fields: [vendorKey], references: [key])
+}
