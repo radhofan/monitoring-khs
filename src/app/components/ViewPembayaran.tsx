@@ -7,43 +7,39 @@ import {
   Typography,
   Form,
   Select,
-  Upload,
+  DatePicker,
   Button,
   message,
   Result,
 } from 'antd';
 import { Kontrak } from '@/types/types';
-import {
-  FileOutlined,
-  InboxOutlined,
-  CheckCircleOutlined,
-} from '@ant-design/icons';
-import type { UploadFile, FormItemProps } from 'antd';
-// import { useStore } from 'zustand';
-// import { authStore } from '@/stores/useAuthStore';
+import { FileOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import type { Dayjs } from 'dayjs';
+import DOMPurify from 'dompurify';
+import { useStore } from 'zustand';
+import { authStore } from '@/stores/useAuthStore';
 
 const { Step } = Steps;
 const { Paragraph, Text, Link } = Typography;
 const { Option } = Select;
-const { Dragger } = Upload;
 
-interface ViewPembayaranModalProps {
+type ViewPembayaranModalProps = {
   visible: boolean;
   data: Kontrak;
   onClose: () => void;
-}
+};
 
-interface PembayaranFormData {
+type PembayaranFormData = {
   termin: string;
-  dokumen: UploadFile[];
-}
+  tanggalPembayaran: Dayjs;
+};
 
 export default function ViewPembayaranModal({
   visible,
   data,
   onClose,
 }: ViewPembayaranModalProps) {
-  // const user = useStore(authStore, (s) => s.user);
+  const user = useStore(authStore, (s) => s.user);
   const [form] = Form.useForm<PembayaranFormData>();
   const [uploading, setUploading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -53,9 +49,14 @@ export default function ViewPembayaranModal({
   );
 
   const handleSubmit = (values: PembayaranFormData) => {
-    console.log('Form submitted:', values);
-    setUploading(true);
+    const sanitizedValues = {
+      termin: DOMPurify.sanitize(values.termin),
+      tanggalPembayaran: values.tanggalPembayaran.toDate(),
+    };
 
+    console.log('Sanitized form submitted:', sanitizedValues);
+
+    setUploading(true);
     setTimeout(() => {
       message.success('Data pembayaran berhasil disiapkan (dummy)');
       setUploading(false);
@@ -68,9 +69,6 @@ export default function ViewPembayaranModal({
     setSubmitted(false);
     onClose();
   };
-
-  const normFile: NonNullable<FormItemProps['getValueFromEvent']> = (e) =>
-    Array.isArray(e) ? e : (e?.fileList ?? []);
 
   return (
     <Modal
@@ -91,7 +89,7 @@ export default function ViewPembayaranModal({
             <CheckCircleOutlined style={{ color: 'green', fontSize: 64 }} />
           }
           title="Pembayaran Berhasil Dikirim!"
-          subTitle="Dokumen pembayaran telah berhasil diunggah dan sedang diproses."
+          subTitle="Tanggal pembayaran berhasil dicatat."
           extra={[
             <Button type="primary" key="close" onClick={handleClose}>
               Tutup
@@ -153,64 +151,57 @@ export default function ViewPembayaranModal({
             ))}
           </Steps>
 
-          {/* {user?.bidang === 'Bidang Perencanaan' && (
-            <> */}
-          <p>
-            <strong>Input Pembayaran:</strong>
-          </p>
-
-          <Form<PembayaranFormData>
-            form={form}
-            layout="vertical"
-            onFinish={handleSubmit}
-            style={{ marginBottom: 32 }}
-          >
-            <Form.Item
-              name="termin"
-              label="Termin Pembayaran"
-              rules={[{ required: true, message: 'Pilih termin pembayaran' }]}
+          {user?.bidang === 'Bidang Perencanaan' && (
+            <Form<PembayaranFormData>
+              form={form}
+              layout="vertical"
+              onFinish={handleSubmit}
+              style={{ marginBottom: 32 }}
             >
-              <Select placeholder="Pilih termin">
-                {terminList.map(([key]) => (
-                  <Option key={key} value={key}>
-                    Termin {key}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item>
-
-            <Form.Item
-              name="dokumen"
-              label="Upload Dokumen Pembayaran"
-              valuePropName="fileList"
-              getValueFromEvent={normFile}
-              rules={[
-                { required: true, message: 'Upload minimal satu dokumen' },
-              ]}
-            >
-              <Dragger name="files" multiple beforeUpload={() => false}>
-                <p className="ant-upload-drag-icon">
-                  <InboxOutlined />
-                </p>
-                <p className="ant-upload-text">Klik atau seret file ke sini</p>
-                <p className="ant-upload-hint">Maksimal beberapa dokumen</p>
-              </Dragger>
-            </Form.Item>
-
-            <Form.Item>
-              <Button
-                type="primary"
-                htmlType="submit"
-                loading={uploading}
-                block
+              <p>
+                <strong>Input Pembayaran:</strong>
+              </p>
+              <Form.Item
+                name="termin"
+                label="Termin Pembayaran"
+                rules={[{ required: true, message: 'Pilih termin pembayaran' }]}
               >
-                Submit Pembayaran
-              </Button>
-            </Form.Item>
-          </Form>
+                <Select placeholder="Pilih termin">
+                  {terminList.map(([key]) => (
+                    <Option key={key} value={key}>
+                      Termin {key}
+                    </Option>
+                  ))}
+                </Select>
+              </Form.Item>
+
+              <Form.Item
+                name="tanggalPembayaran"
+                label="Tanggal Pembayaran"
+                rules={[
+                  { required: true, message: 'Tanggal pembayaran wajib diisi' },
+                ]}
+              >
+                <DatePicker
+                  style={{ width: '100%' }}
+                  format="DD-MM-YYYY"
+                  placeholder="Pilih tanggal pembayaran"
+                />
+              </Form.Item>
+
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={uploading}
+                  block
+                >
+                  Submit Pembayaran
+                </Button>
+              </Form.Item>
+            </Form>
+          )}
         </>
-        // )}
-        // </>
       )}
     </Modal>
   );

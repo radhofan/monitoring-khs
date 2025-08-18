@@ -16,7 +16,10 @@ import { UploadOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import type { UploadFile } from 'antd';
 import type { FormItemProps } from 'antd';
+import type { Dayjs } from 'dayjs';
 import { Kontrak } from '@/types/types';
+import DOMPurify from 'dompurify';
+import dayjs from 'dayjs';
 
 type InputAmandemenModalProps = {
   visible: boolean;
@@ -30,7 +33,7 @@ type AmandemenFormData = {
   perubahanKontrak: string;
   perubahanDireksi?: string;
   perubahanPengawas?: string;
-  tanggalBerlaku: string;
+  tanggalBerlaku: Dayjs;
   nilaiKontrak: number;
   oldTermin?: number;
   perubahanTermin?: string;
@@ -46,16 +49,77 @@ export default function InputAmandemenModal({
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (values: AmandemenFormData) => {
-    console.log('Form values:', values);
-    setLoading(true);
+  const handleSubmit = async () => {
+    try {
+      const values = await form.validateFields();
 
-    setTimeout(() => {
-      message.success('Amandemen berhasil disimpan (dummy)');
-      setLoading(false);
-      setSubmitted(true);
-      form.resetFields();
-    }, 1000);
+      const perubahanDireksi = values.perubahanDireksi?.trim();
+      const perubahanPengawas = values.perubahanPengawas?.trim();
+      const tanggalBerlaku = values.tanggalBerlaku;
+      const nilaiKontrak = values.nilaiKontrak;
+
+      const atLeastOneFilled =
+        !!perubahanDireksi ||
+        !!perubahanPengawas ||
+        (tanggalBerlaku && dayjs(tanggalBerlaku).isValid()) ||
+        (!!nilaiKontrak && nilaiKontrak > 0);
+
+      if (!atLeastOneFilled) {
+        message.error('Please fill at least one field of the four required');
+
+        form.setFields([
+          {
+            name: 'perubahanDireksi',
+            errors: ['Fill at least one field'],
+          },
+          {
+            name: 'perubahanPengawas',
+            errors: ['Fill at least one field'],
+          },
+          {
+            name: 'tanggalBerlaku',
+            errors: ['Fill at least one field'],
+          },
+          {
+            name: 'nilaiKontrak',
+            errors: ['Fill at least one field'],
+          },
+        ]);
+
+        return;
+      }
+
+      const sanitizedValues = {
+        ...values,
+        nomorKontrak: DOMPurify.sanitize(values.nomorKontrak),
+        nomorAmandemen: DOMPurify.sanitize(values.nomorAmandemen),
+        perubahanKontrak: DOMPurify.sanitize(values.perubahanKontrak),
+        perubahanDireksi: perubahanDireksi
+          ? DOMPurify.sanitize(perubahanDireksi)
+          : undefined,
+        perubahanPengawas: perubahanPengawas
+          ? DOMPurify.sanitize(perubahanPengawas)
+          : undefined,
+        tanggalBerlaku: values.tanggalBerlaku?.toDate(),
+        nilaiKontrak: values.nilaiKontrak,
+        oldTermin: values.oldTermin,
+        perubahanTermin: values.perubahanTermin
+          ? DOMPurify.sanitize(values.perubahanTermin)
+          : undefined,
+        file: values.file,
+      };
+
+      setLoading(true);
+      console.log(sanitizedValues);
+      setTimeout(() => {
+        message.success('Amandemen berhasil disimpan (dummy)');
+        setLoading(false);
+        setSubmitted(true);
+        form.resetFields();
+      }, 1000);
+    } catch (err) {
+      console.log('Validation failed', err);
+    }
   };
 
   const handleClose = () => {
@@ -74,10 +138,7 @@ export default function InputAmandemenModal({
       onCancel={handleClose}
       footer={null}
       width={700}
-      bodyStyle={{
-        maxHeight: '70vh',
-        overflowY: 'auto',
-      }}
+      bodyStyle={{ maxHeight: '70vh', overflowY: 'auto' }}
     >
       {submitted ? (
         <Result
@@ -108,6 +169,7 @@ export default function InputAmandemenModal({
               ))}
             </Select>
           </Form.Item>
+
           <Form.Item
             name="nomorAmandemen"
             label="Nomor Amandemen Kontrak"
@@ -118,7 +180,7 @@ export default function InputAmandemenModal({
 
           <Form.Item
             name="perubahanKontrak"
-            label="Input Perubahan Kontrak"
+            label="Input Deskripsi Perubahan Kontrak"
             rules={[{ required: true, message: 'Mohon isi perubahan kontrak' }]}
           >
             <Input.TextArea rows={3} />
@@ -141,26 +203,20 @@ export default function InputAmandemenModal({
           <Form.Item
             name="tanggalBerlaku"
             label="Perubahan Tanggal Berlaku Kontrak"
-            rules={[{ required: true, message: 'Mohon pilih tanggal' }]}
           >
             <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
           </Form.Item>
 
-          <Form.Item
-            name="nilaiKontrak"
-            label="Perubahan Nilai Kontrak"
-            rules={[{ required: true, message: 'Mohon isi nilai kontrak' }]}
-          >
+          <Form.Item name="nilaiKontrak" label="Perubahan Nilai Kontrak">
             <InputNumber<number>
               style={{ width: '100%' }}
               min={0}
               formatter={(value) =>
                 `Rp ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
               }
-              parser={(value) => {
-                if (!value) return 0;
-                return parseInt(value.replace(/[^0-9]/g, ''), 10);
-              }}
+              parser={(value) =>
+                value ? parseInt(value.replace(/[^0-9]/g, ''), 10) : 0
+              }
             />
           </Form.Item>
 
@@ -178,16 +234,22 @@ export default function InputAmandemenModal({
                 name="perubahanTermin"
                 style={{ flex: 1, marginBottom: 0 }}
                 rules={[
-                  { required: true, message: 'Mohon isi Jumlah Termin Baru' },
                   {
                     validator: (_, value) => {
                       const oldValue = form.getFieldValue('oldTermin');
-                      if (value > oldValue) {
+                      if (
+                        value === undefined ||
+                        value === null ||
+                        value === ''
+                      ) {
+                        return Promise.resolve();
+                      }
+                      if (value >= oldValue) {
                         return Promise.resolve();
                       }
                       return Promise.reject(
                         new Error(
-                          'Jumlah termin baru harus lebih dari termin sebelumnya'
+                          'Jumlah termin baru harus sama atau lebih dari termin sebelumnya'
                         )
                       );
                     },

@@ -12,25 +12,40 @@ import {
 } from 'antd';
 import { UploadOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import { useState } from 'react';
+import DOMPurify from 'dompurify';
+import type { UploadFile } from 'antd/es/upload/interface';
 
 type InputSuratPeringatanModalProps = {
   visible: boolean;
   onClose: () => void;
 };
 
+type SuratPeringatanFormData = {
+  nomorSurat: string;
+  tanggalRp: Date;
+  alasanPeringatan: string;
+  file: UploadFile[];
+};
+
 export default function InputSuratPeringatanModal({
   visible,
   onClose,
 }: InputSuratPeringatanModalProps) {
-  const [form] = Form.useForm();
+  const [form] = Form.useForm<SuratPeringatanFormData>();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleOk = () => {
     form.validateFields().then((values) => {
+      const sanitizedValues: SuratPeringatanFormData = {
+        ...values,
+        nomorSurat: DOMPurify.sanitize(values.nomorSurat || ''),
+        tanggalRp: values.tanggalRp,
+        alasanPeringatan: DOMPurify.sanitize(values.alasanPeringatan || ''),
+        file: values.file,
+      };
       setLoading(true);
-      console.log('Form values:', values);
-
+      console.log(sanitizedValues);
       setTimeout(() => {
         message.success('Surat peringatan berhasil disimpan.');
         setSubmitted(true);
@@ -101,6 +116,14 @@ export default function InputSuratPeringatanModal({
             rules={[{ required: true, message: 'Mohon pilih tanggal' }]}
           >
             <DatePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
+          </Form.Item>
+
+          <Form.Item
+            name="alasanPeringatan"
+            label="Alasan Peringatan"
+            rules={[{ required: true, message: 'Mohon isi alasan peringatan' }]}
+          >
+            <Input placeholder="Delivery Aplikasi Terlambat" />
           </Form.Item>
 
           <Form.Item

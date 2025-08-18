@@ -79,14 +79,14 @@ export default function SidebarLayout({
               paddingBottom: collapsed
                 ? 0
                 : user?.bidang === 'Bidang Perencanaan'
-                  ? 740
-                  : 790,
+                  ? 790
+                  : 740,
             }}
           >
             <Menu.Item key="1" icon={<FileTextOutlined />}>
               <Link href="/">Daftar Kontrak</Link>
             </Menu.Item>
-            {user?.bidang === 'Bidang Perencanaan' && (
+            {user?.bidang !== 'Bidang Perencanaan' && (
               <Menu.Item key="2" icon={<FileAddOutlined />}>
                 <Link href="/pengajuan-baru">Pengajuan Baru</Link>
               </Menu.Item>

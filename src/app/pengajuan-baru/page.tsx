@@ -18,6 +18,8 @@ import {
 import dayjs from 'dayjs';
 import { CheckCircleOutlined, InboxOutlined } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useStore } from 'zustand';
+import { authStore } from '@/stores/useAuthStore';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -36,6 +38,7 @@ type FormState = {
 };
 
 export default function PengajuanBaruPage() {
+  const user = useStore(authStore, (s) => s.user);
   const router = useRouter();
 
   const [terminType, setTerminType] = useState<'milestone' | 'tanggal'>(
@@ -48,7 +51,7 @@ export default function PengajuanBaruPage() {
   const [form, setForm] = useState<FormState>({
     namaPekerjaan: '',
     tipePekerjaan: '',
-    bidangPekerjaan: '',
+    bidangPekerjaan: user?.subBidang || '',
     direksi: '',
     pengawas: '',
     vendor: '',
@@ -166,30 +169,12 @@ export default function PengajuanBaruPage() {
 
                 <div>
                   <Text>Bidang Pekerjaan *</Text>
-                  <Select
-                    placeholder="Pilih bidang pekerjaan"
-                    value={form.bidangPekerjaan || undefined}
-                    onChange={(val) =>
-                      handleInputChange('bidangPekerjaan', val)
-                    }
-                    status={errors.tipePekerjaan ? 'error' : ''}
+                  <Input
+                    value={form.bidangPekerjaan}
+                    disabled
+                    placeholder={user?.subBidang}
                     style={{ width: '100%' }}
-                  >
-                    <Option value="ERP Finance">ERP Finance</Option>
-                    <Option value="ERP Human Capital">ERP Human Capital</Option>
-                    <Option value="ERP Procurement & Logistic">
-                      ERP Procurement & Logistic
-                    </Option>
-                    <Option value="Distribusi & Pelayanan Pelanggan">
-                      Distribusi & Pelayanan Pelanggan
-                    </Option>
-                    <Option value="Proyek, Pembangkit & Transmisi">
-                      Proyek, Pembangkit & Transmisi
-                    </Option>
-                    <Option value="Data Analitik & Geospasial">
-                      Data Analitik & Geospasial
-                    </Option>
-                  </Select>
+                  />
                 </div>
 
                 <div>
@@ -225,6 +210,12 @@ export default function PengajuanBaruPage() {
                     style={{ width: '100%' }}
                     placeholder="Input Number"
                     value={form.nilai ?? undefined}
+                    formatter={(value) =>
+                      `Rp ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
+                    }
+                    parser={(value) =>
+                      value ? parseInt(value.replace(/[^0-9]/g, ''), 10) : 0
+                    }
                     onChange={(val) => handleInputChange('nilai', val)}
                     status={errors.nilai ? 'error' : ''}
                   />
