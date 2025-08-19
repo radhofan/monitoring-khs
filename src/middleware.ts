@@ -6,7 +6,7 @@ export async function middleware(req: NextRequest) {
 
   if (
     pathname === '/login' ||
-    pathname.startsWith('/api/login') ||
+    pathname.startsWith('/api') ||
     pathname.includes('.')
   ) {
     return NextResponse.next();

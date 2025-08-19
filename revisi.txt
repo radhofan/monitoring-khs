@@ -30,3 +30,35 @@
 26. upload dokumen ganti tanggal pembayaran                                    # DONE
 27. bidang aplikasi gabisa input termin pembayaran, bidang perencanaan bisa    # DONE
 28. bidang aplikasi bisa input kontrak baru, bidang perencanaan gabisa         # DONE
+
+
+### TEST API
+
+http://localhost:3000/api/kontrak/get-kontrak-by-sub-bidang?subBidang=ERP%20Finance
+
+http://localhost:3000/api/kontrak/get-kontrak-all
+
+http://localhost:3000/api/kontrak/input-kontrak
+{
+  "namaPekerjaan": "Pembuatan Dashboard Monitoring",
+  "subBidang": "ERP Finance",
+  "tipePekerjaan": "Pengembangan / Change Request",
+  "direksiPekerjaan": "Wahyu Ramadhan",
+  "pengawasPekerjaan": "Intan Permata",
+  "vendorKey": "6",
+  "vendorKHS": "PT Ecomindo Saranacipta",
+  "nilaiTotal": 50000000,
+  "nomorKontrak": "K-001",
+  "nomorAmandemenKontrak": null,
+  "amandemenKontrakDetail": null,
+  "tanggalMulai": "2025-08-20T00:00:00.000Z",
+  "tanggalSelesai": "2025-12-20T00:00:00.000Z",
+  "terminPembayaran": "Termin 6",
+  "infoStatusPembayaran": "Belum Terbayar Semua",
+  "dataStatusPembayaran": {},
+  "infoEvaluasi": "Belum Selesai"
+}
+
+http://localhost:3000/api/kontrak/get-kontrak-by-sub-bidang-and-vendor?subBidang=ERP%20Finance&vendorKey=1
+
+http://localhost:3000/api/vendor/get-vendor-all

@@ -10,7 +10,7 @@ export interface Kontrak {
   vendorKHS: string;
   nilaiTotal: number;
   nomorKontrak: string;
-  nomorAmandemenKontrak: string;
+  nomorAmandemenKontrak?: string;
   amandemenKontrakDetail?: AmandemenKontrak;
   tanggalMulai: string;
   tanggalSelesai: string;

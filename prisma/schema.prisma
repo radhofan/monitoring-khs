@@ -24,7 +24,7 @@ model User {
 }
 
 model Vendor {
-  key                String   @id
+  key                String   @id @default(uuid())
   namaVendor         String
   nilaiKeseluruhan   Float
   evaluasiVendor     Float
@@ -35,7 +35,7 @@ model Vendor {
 }
 
 model Kontrak {
-  key                       String   @id
+  key                       String   @id @default(uuid())
   namaPekerjaan             String
   subBidang                 String
   tipePekerjaan             String

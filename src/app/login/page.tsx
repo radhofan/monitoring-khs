@@ -19,7 +19,7 @@ export default function LoginPage() {
   const onFinish = async (values: LoginFormValues) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(values),

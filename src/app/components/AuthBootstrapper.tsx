@@ -7,7 +7,7 @@ export default function AuthBootstrapper() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch('/api/me');
+        const res = await fetch('/api/auth/get-profile');
         if (!res.ok) throw new Error('Not authenticated');
         const data = await res.json();
         authStore.setState({ user: data });
