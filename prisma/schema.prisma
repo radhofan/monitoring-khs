@@ -49,7 +49,9 @@ model Kontrak {
   amandemenKontrakDetail    Json? 
   tanggalMulai              DateTime
   tanggalSelesai            DateTime
-  terminPembayaran          String
+  jenisTerminPembayaran     String
+  jumlahTermin              Int?
+  tanggalPembayaran         Int?
   infoStatusPembayaran      String
   dataStatusPembayaran      Json  
   infoEvaluasi              String

@@ -3,8 +3,11 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { Spin } from 'antd';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import SidebarLayout from '@/app/components/SidebarLayout';
 import AuthBootstrapper from './AuthBootstrapper';
+
+const queryClient = new QueryClient();
 
 export default function ClientLayout({ children }: { children: ReactNode }) {
   const [isReady, setIsReady] = useState(false);
@@ -34,9 +37,9 @@ export default function ClientLayout({ children }: { children: ReactNode }) {
   }
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <AuthBootstrapper />
       <SidebarLayout>{children}</SidebarLayout>
-    </>
+    </QueryClientProvider>
   );
 }

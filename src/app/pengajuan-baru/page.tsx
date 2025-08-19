@@ -20,6 +20,7 @@ import { CheckCircleOutlined, InboxOutlined } from '@ant-design/icons';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from 'zustand';
 import { authStore } from '@/stores/useAuthStore';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -27,57 +28,55 @@ const { Option } = Select;
 type FormState = {
   namaPekerjaan: string;
   tipePekerjaan: string;
-  bidangPekerjaan: string;
-  direksi: string;
-  pengawas: string;
-  vendor: string;
-  nilai: number | null;
+  subBidang: string;
+  direksiPekerjaan: string;
+  pengawasPekerjaan: string;
+  vendorKHS: string;
+  nilaiTotal: number | null;
   nomorKontrak: string;
   tanggalMulai: dayjs.Dayjs | null;
   tanggalSelesai: dayjs.Dayjs | null;
+  jenisTerminPembayaran: string;
+  jumlahTermin: number | null;
+  tanggalPembayaran: number | null;
+  vendorKey: string;
 };
 
 export default function PengajuanBaruPage() {
   const user = useStore(authStore, (s) => s.user);
   const router = useRouter();
-
   const [terminType, setTerminType] = useState<'milestone' | 'tanggal'>(
     'milestone'
   );
-  const [milestoneCount, setMilestoneCount] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(false);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-
   const [form, setForm] = useState<FormState>({
     namaPekerjaan: '',
     tipePekerjaan: '',
-    bidangPekerjaan: user?.subBidang || '',
-    direksi: '',
-    pengawas: '',
-    vendor: '',
-    nilai: null,
+    subBidang: user?.subBidang || '',
+    direksiPekerjaan: '',
+    pengawasPekerjaan: '',
+    vendorKHS: '',
+    nilaiTotal: null,
     nomorKontrak: '',
     tanggalMulai: null,
     tanggalSelesai: null,
+    jenisTerminPembayaran: '',
+    jumlahTermin: null,
+    tanggalPembayaran: null,
+    vendorKey: '1',
   });
-
   const [errors, setErrors] = useState<
     Partial<Record<keyof FormState, string>>
   >({});
 
-  const validateForm = (): Partial<Record<keyof FormState, string>> => {
-    const newErrors: Partial<Record<keyof FormState, string>> = {};
-    if (!form.namaPekerjaan.trim()) newErrors.namaPekerjaan = 'Wajib diisi';
-    if (!form.tipePekerjaan) newErrors.tipePekerjaan = 'Wajib diisi';
-    if (!form.direksi.trim()) newErrors.direksi = 'Wajib diisi';
-    if (!form.pengawas.trim()) newErrors.pengawas = 'Wajib diisi';
-    if (!form.vendor) newErrors.vendor = 'Wajib diisi';
-    if (form.nilai === null) newErrors.nilai = 'Wajib diisi';
-    if (!form.nomorKontrak.trim()) newErrors.nomorKontrak = 'Wajib diisi';
-    if (!form.tanggalMulai) newErrors.tanggalMulai = 'Wajib diisi';
-    if (!form.tanggalSelesai) newErrors.tanggalSelesai = 'Wajib diisi';
-    return newErrors;
-  };
+  const { data: vendors } = useQuery({
+    queryKey: ['get-vendor-all'],
+    queryFn: async () => {
+      const res = await fetch('/api/vendor/get-vendor-all');
+      if (!res.ok) throw new Error('Failed to fetch vendors');
+      return res.json();
+    },
+  });
 
   const handleInputChange = <K extends keyof FormState>(
     key: K,
@@ -87,20 +86,61 @@ export default function PengajuanBaruPage() {
     setErrors((prev) => ({ ...prev, [key]: '' }));
   };
 
-  const handleSubmit = () => {
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    setErrors({});
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      setIsModalVisible(true);
-    }, 1200);
+  const validateForm = (): Partial<Record<keyof FormState, string>> => {
+    const newErrors: Partial<Record<keyof FormState, string>> = {};
+    if (!form.namaPekerjaan.trim()) newErrors.namaPekerjaan = 'Wajib diisi';
+    if (!form.tipePekerjaan) newErrors.tipePekerjaan = 'Wajib diisi';
+    if (!form.direksiPekerjaan.trim())
+      newErrors.direksiPekerjaan = 'Wajib diisi';
+    if (!form.pengawasPekerjaan.trim())
+      newErrors.pengawasPekerjaan = 'Wajib diisi';
+    if (!form.vendorKHS) newErrors.vendorKHS = 'Wajib diisi';
+    if (form.nilaiTotal === null) newErrors.nilaiTotal = 'Wajib diisi';
+    if (!form.nomorKontrak.trim()) newErrors.nomorKontrak = 'Wajib diisi';
+    if (!form.tanggalMulai) newErrors.tanggalMulai = 'Wajib diisi';
+    if (!form.tanggalSelesai) newErrors.tanggalSelesai = 'Wajib diisi';
+    return newErrors;
   };
+
+  const reformatForm = () => {
+    return {
+      ...form,
+      jenisTerminPembayaran: terminType,
+      jumlahTermin: terminType === 'milestone' ? form.jumlahTermin : null,
+      tanggalPembayaran:
+        terminType === 'tanggal' ? form.tanggalPembayaran : null,
+      tanggalMulai: form.tanggalMulai?.toISOString(),
+      tanggalSelesai: form.tanggalSelesai?.toISOString(),
+      infoStatusPembayaran: 'Belum Terbayar Semua',
+      dataStatusPembayaran: {},
+      infoEvaluasi: 'Belum Selesai',
+    };
+  };
+
+  const { mutate: submitKontrak, isPending } = useMutation({
+    mutationFn: async () => {
+      const validationErrors = validateForm();
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        throw new Error('Validation failed');
+      }
+
+      const payload = reformatForm();
+      const res = await fetch('/api/kontrak/input-kontrak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error('Submit failed');
+      return res.json();
+    },
+    onSuccess: () => {
+      setErrors({});
+      setIsModalVisible(true);
+    },
+    onError: (err) => console.error(err),
+  });
 
   const handleModalOk = () => {
     setIsModalVisible(false);
@@ -135,8 +175,11 @@ export default function PengajuanBaruPage() {
                 {(
                   [
                     { label: 'Nama Pekerjaan *', field: 'namaPekerjaan' },
-                    { label: 'Direksi Pekerjaan *', field: 'direksi' },
-                    { label: 'Pengawas Pekerjaan *', field: 'pengawas' },
+                    { label: 'Direksi Pekerjaan *', field: 'direksiPekerjaan' },
+                    {
+                      label: 'Pengawas Pekerjaan *',
+                      field: 'pengawasPekerjaan',
+                    },
                     { label: 'Nomor Kontrak *', field: 'nomorKontrak' },
                   ] as const
                 ).map(({ label, field }) => (
@@ -160,17 +203,19 @@ export default function PengajuanBaruPage() {
                     status={errors.tipePekerjaan ? 'error' : ''}
                     style={{ width: '100%' }}
                   >
-                    <Option value="change">
+                    <Option value="Pengembangan / Change Request">
                       Pengembangan / Change Request
                     </Option>
-                    <Option value="ophar">Pemeliharaan / Ophar</Option>
+                    <Option value="Pemeliharaan / Ophar">
+                      Pemeliharaan / Ophar
+                    </Option>
                   </Select>
                 </div>
 
                 <div>
                   <Text>Bidang Pekerjaan *</Text>
                   <Input
-                    value={form.bidangPekerjaan}
+                    value={form.subBidang}
                     disabled
                     placeholder={user?.subBidang}
                     style={{ width: '100%' }}
@@ -181,26 +226,18 @@ export default function PengajuanBaruPage() {
                   <Text>Nama Vendor KHS *</Text>
                   <Select
                     placeholder="Pilih Vendor"
-                    value={form.vendor || undefined}
-                    onChange={(val) => handleInputChange('vendor', val)}
-                    status={errors.vendor ? 'error' : ''}
+                    value={form.vendorKHS || undefined}
+                    onChange={(val) => handleInputChange('vendorKHS', val)}
+                    status={errors.vendorKHS ? 'error' : ''}
                     style={{ width: '100%' }}
                   >
-                    <Option value="akhdani">
-                      PT Akhdani Reka Solusi (Akhdani)
-                    </Option>
-                    <Option value="pds">PT Prima Data Semesta (PDS)</Option>
-                    <Option value="iglo">
-                      PT Indocyber Global Teknologi (IGLO)
-                    </Option>
-                    <Option value="webcenter">
-                      PT Webcenter Sentra Solusindo
-                    </Option>
-                    <Option value="ddn">PT Duta Digital Nusantara (DDN)</Option>
-                    <Option value="bangunindo">
-                      PT Bangunindo Tekunsa Jaya
-                    </Option>
-                    <Option value="ecomindo">PT Ecomindo Saranacipta</Option>
+                    {vendors?.map(
+                      (vendor: { key: string; namaVendor: string }) => (
+                        <Option key={vendor.key} value={vendor.namaVendor}>
+                          {vendor.namaVendor}
+                        </Option>
+                      )
+                    )}
                   </Select>
                 </div>
 
@@ -209,15 +246,15 @@ export default function PengajuanBaruPage() {
                   <InputNumber
                     style={{ width: '100%' }}
                     placeholder="Input Number"
-                    value={form.nilai ?? undefined}
+                    value={form.nilaiTotal ?? undefined}
                     formatter={(value) =>
                       `Rp ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, '.')
                     }
                     parser={(value) =>
                       value ? parseInt(value.replace(/[^0-9]/g, ''), 10) : 0
                     }
-                    onChange={(val) => handleInputChange('nilai', val)}
-                    status={errors.nilai ? 'error' : ''}
+                    onChange={(val) => handleInputChange('nilaiTotal', val)}
+                    status={errors.nilaiTotal ? 'error' : ''}
                   />
                 </div>
 
@@ -278,9 +315,10 @@ export default function PengajuanBaruPage() {
                   <InputNumber
                     min={1}
                     max={10}
-                    value={milestoneCount}
-                    onChange={(value) => setMilestoneCount(value || 1)}
+                    value={form.jumlahTermin}
                     style={{ width: '100%' }}
+                    placeholder="1"
+                    onChange={(val) => handleInputChange('jumlahTermin', val)}
                   />
                 </>
               ) : (
@@ -288,8 +326,11 @@ export default function PengajuanBaruPage() {
                   <p>Input Tanggal Pembayaran Rutin (1–30)</p>
                   <InputNumber
                     style={{ width: '100%' }}
-                    value={milestoneCount}
+                    value={form.tanggalPembayaran}
                     placeholder="1–30"
+                    onChange={(val) =>
+                      handleInputChange('tanggalPembayaran', val)
+                    }
                   />
                 </>
               )}
@@ -330,8 +371,8 @@ export default function PengajuanBaruPage() {
               <Button
                 type="primary"
                 size="large"
-                loading={loading}
-                onClick={handleSubmit}
+                loading={isPending}
+                onClick={() => submitKontrak()}
                 block
               >
                 Submit

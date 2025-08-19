@@ -14,6 +14,9 @@ export interface Kontrak {
   amandemenKontrakDetail?: AmandemenKontrak;
   tanggalMulai: string;
   tanggalSelesai: string;
+  jenisTerminPembayaran?: string;
+  jumlahTermin?: number;
+  tanggalPembayaran?: number;
   terminPembayaran: string;
   infoStatusPembayaran:
     | 'Terbayar Semua'
