@@ -21,6 +21,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useStore } from 'zustand';
 import { authStore } from '@/stores/useAuthStore';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { TerminDetail } from '@/types/types';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -45,8 +46,8 @@ type FormState = {
 export default function PengajuanBaruPage() {
   const user = useStore(authStore, (s) => s.user);
   const router = useRouter();
-  const [terminType, setTerminType] = useState<'milestone' | 'tanggal'>(
-    'milestone'
+  const [terminType, setTerminType] = useState<'Milestone' | 'Tanggal'>(
+    'Milestone'
   );
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const [form, setForm] = useState<FormState>({
@@ -103,16 +104,24 @@ export default function PengajuanBaruPage() {
   };
 
   const reformatForm = () => {
+    const dataStatusPembayaran: Record<number, TerminDetail> = {};
+    if (terminType === 'Milestone' && form.jumlahTermin) {
+      for (let i = 1; i <= form.jumlahTermin; i++) {
+        dataStatusPembayaran[i] = { status: 'Belum Terbayar' };
+      }
+    } else if (terminType === 'Tanggal') {
+      dataStatusPembayaran[1] = { status: 'Belum Terbayar' };
+    }
     return {
       ...form,
       jenisTerminPembayaran: terminType,
-      jumlahTermin: terminType === 'milestone' ? form.jumlahTermin : null,
+      jumlahTermin: terminType === 'Milestone' ? form.jumlahTermin : null,
       tanggalPembayaran:
-        terminType === 'tanggal' ? form.tanggalPembayaran : null,
+        terminType === 'Tanggal' ? form.tanggalPembayaran : null,
       tanggalMulai: form.tanggalMulai?.toISOString(),
       tanggalSelesai: form.tanggalSelesai?.toISOString(),
       infoStatusPembayaran: 'Belum Terbayar Semua',
-      dataStatusPembayaran: {},
+      dataStatusPembayaran,
       infoEvaluasi: 'Belum Selesai',
     };
   };
@@ -305,16 +314,16 @@ export default function PengajuanBaruPage() {
                 value={terminType}
                 style={{ marginBottom: 16 }}
               >
-                <Radio value="milestone">Termin Milestones</Radio>
-                <Radio value="tanggal">Termin Tanggal</Radio>
+                <Radio value="Milestone">Termin Milestones</Radio>
+                <Radio value="Tanggal">Termin Tanggal</Radio>
               </Radio.Group>
 
-              {terminType === 'milestone' ? (
+              {terminType === 'Milestone' ? (
                 <>
-                  <p>Input Jumlah Termin (1–12)</p>
+                  <p>Input Jumlah Termin (1–24)</p>
                   <InputNumber
                     min={1}
-                    max={10}
+                    max={24}
                     value={form.jumlahTermin}
                     style={{ width: '100%' }}
                     placeholder="1"
@@ -323,11 +332,13 @@ export default function PengajuanBaruPage() {
                 </>
               ) : (
                 <>
-                  <p>Input Tanggal Pembayaran Rutin (1–30)</p>
+                  <p>Input Tanggal Pembayaran Rutin (1–31)</p>
                   <InputNumber
+                    min={1}
+                    max={31}
                     style={{ width: '100%' }}
                     value={form.tanggalPembayaran}
-                    placeholder="1–30"
+                    placeholder="1–31"
                     onChange={(val) =>
                       handleInputChange('tanggalPembayaran', val)
                     }

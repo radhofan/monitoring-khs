@@ -7,13 +7,14 @@ import type { ColumnsType, ColumnType } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { vendor, kontrak } from '@/types/dummy';
+// import { vendor, kontrak } from '@/types/dummy';
 import { useStore } from 'zustand';
 import { authStore } from '@/stores/useAuthStore';
 
 const { Title } = Typography;
 
 import type { Vendor } from '@/types/types';
+import { useQuery } from '@tanstack/react-query';
 
 export default function DaftarVendorPage() {
   const router = useRouter();
@@ -24,6 +25,15 @@ export default function DaftarVendorPage() {
   const handleClick = (record: Vendor) => {
     router.push(`/daftar-vendor/${record.key}`);
   };
+
+  const { data: vendors, isLoading } = useQuery({
+    queryKey: ['get-vendor-all'],
+    queryFn: async () => {
+      const res = await fetch('/api/vendor/get-vendor-all');
+      if (!res.ok) throw new Error('Failed to fetch vendors');
+      return res.json();
+    },
+  });
 
   const getColumnSearchProps = (
     dataIndex: keyof Vendor
@@ -240,21 +250,43 @@ export default function DaftarVendorPage() {
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
     },
+    // {
+    //   title: 'Total Proyek di Bidang',
+    //   key: 'totalProyek',
+    //   render: (_, record) => {
+    //     const count = vendors.filter(
+    //       (k) => k.vendorKey === record.key && k.subBidang === user?.subBidang
+    //     ).length;
+    //     return count;
+    //   },
+    //   sorter: (a, b) => {
+    //     const aCount = kontrak.filter(
+    //       (k) => k.vendorKey === a.key && k.subBidang === user?.subBidang
+    //     ).length;
+    //     const bCount = kontrak.filter(
+    //       (k) => k.vendorKey === b.key && k.subBidang === user?.subBidang
+    //     ).length;
+    //     return aCount - bCount;
+    //   },
+    //   ...getColumnSearchProps('totalProyek'),
+    //   onHeaderCell: () => ({ style: headerStyle }),
+    //   onCell: () => ({ style: cellStyle }),
+    // },
     {
       title: 'Total Proyek di Bidang',
       key: 'totalProyek',
       render: (_, record) => {
-        const count = kontrak.filter(
-          (k) => k.vendorKey === record.key && k.subBidang === user?.subBidang
+        const count = record.kontraks.filter(
+          (k) => k.subBidang === user?.subBidang
         ).length;
         return count;
       },
       sorter: (a, b) => {
-        const aCount = kontrak.filter(
-          (k) => k.vendorKey === a.key && k.subBidang === user?.subBidang
+        const aCount = a.kontraks.filter(
+          (k) => k.subBidang === user?.subBidang
         ).length;
-        const bCount = kontrak.filter(
-          (k) => k.vendorKey === b.key && k.subBidang === user?.subBidang
+        const bCount = b.kontraks.filter(
+          (k) => k.subBidang === user?.subBidang
         ).length;
         return aCount - bCount;
       },
@@ -288,7 +320,9 @@ export default function DaftarVendorPage() {
           View Monitoring Vendor
         </Title>
         <Table
-          dataSource={vendor}
+          // dataSource={vendor}
+          dataSource={vendors}
+          loading={isLoading}
           columns={columns}
           pagination={{ pageSize: 8 }}
           bordered

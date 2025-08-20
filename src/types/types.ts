@@ -34,6 +34,7 @@ export interface Vendor {
   suratPeringatan: 'Ada' | 'Tidak ada';
   totalProyek: number;
   suratPeringatanDetail?: SuratPeringatan[];
+  kontraks: Kontrak[];
 }
 
 export interface User {

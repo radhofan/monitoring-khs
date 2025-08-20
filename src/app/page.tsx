@@ -6,7 +6,7 @@ import type { ColumnsType } from 'antd/es/table';
 import { SearchOutlined } from '@ant-design/icons';
 import type { FilterDropdownProps } from 'antd/es/table/interface';
 import type { ColumnType } from 'antd/es/table';
-import { Kontrak } from '@/types/types';
+import { Kontrak, TerminDetail } from '@/types/types';
 import ViewPembayaranModal from '@/app/components/ViewPembayaran';
 import EvaluasiVendorModal from '@/app/components/EvaluasiVendor';
 import DataDashboard from '@/app/components/DataDashboard';
@@ -15,6 +15,8 @@ import { formatNumToRupiah } from '@/lib/currency';
 import { useStore } from 'zustand';
 import { authStore } from '@/stores/useAuthStore';
 import { kontrak } from '@/types/dummy';
+import { useQuery } from '@tanstack/react-query';
+import { formatDate } from '@/lib/date';
 
 const { Title } = Typography;
 
@@ -29,6 +31,25 @@ export default function DaftarKontrakPage() {
     setSelectedRecord(record);
     setShowModal(true);
   };
+
+  // PROD
+  const { data: kontraks, isLoading } = useQuery({
+    queryKey: ['kontrak', user?.subBidang],
+    queryFn: async () => {
+      let url = '/api/kontrak/get-kontrak-all';
+
+      if (user?.subBidang) {
+        url = `/api/kontrak/get-kontrak-by-sub-bidang?subBidang=${encodeURIComponent(
+          user.subBidang
+        )}`;
+      }
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Failed to fetch kontrak');
+      return res.json();
+    },
+    enabled: !!user,
+  });
 
   const getColumnSearchProps = (
     dataIndex: keyof Kontrak
@@ -161,7 +182,7 @@ export default function DaftarKontrakPage() {
       key: 'nilaiTotal',
       sorter: (a, b) => a.nilaiTotal - b.nilaiTotal,
       render: (value: number) => (
-        <span style={{ color: '#389e0d' }}>{formatNumToRupiah(value)}</span>
+        <p style={{ color: '#389e0d' }}>{formatNumToRupiah(value)}</p>
       ),
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
@@ -180,7 +201,7 @@ export default function DaftarKontrakPage() {
       dataIndex: 'nomorAmandemenKontrak',
       key: 'nomorAmandemenKontrak',
       ...getColumnSearchProps('nomorAmandemenKontrak'),
-      render: (text) => <p>{text}</p>,
+      render: (text) => <p>{text || '-'}</p>,
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
     },
@@ -190,6 +211,7 @@ export default function DaftarKontrakPage() {
       key: 'tanggalMulai',
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
+      render: (value: string) => formatDate(value),
     },
     {
       title: 'Selesai Kontrak',
@@ -197,15 +219,45 @@ export default function DaftarKontrakPage() {
       key: 'tanggalSelesai',
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
+      render: (value: string) => formatDate(value),
     },
     {
-      title: 'Termin Pembayaran Saat Ini',
-      dataIndex: 'terminPembayaran',
-      key: 'terminPembayaran',
+      title: 'Jenis Termin Pembayaran',
+      dataIndex: 'jenisTerminPembayaran',
+      key: 'jenisTerminPembayaran',
       render: (text) => <Tag color="blue">{text}</Tag>,
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
     },
+    // Prod
+    {
+      title: 'Termin Pembayaran Saat Ini',
+      dataIndex: 'dataStatusPembayaran',
+      key: 'terminPembayaran',
+      render: (dataStatusPembayaran: Record<number, TerminDetail>) => {
+        if (!dataStatusPembayaran) return null;
+        const entries = Object.entries(dataStatusPembayaran);
+        const firstUnpaid = entries.find(
+          ([, termin]) => termin.status === 'Belum Terbayar'
+        );
+        const indexToShow = firstUnpaid
+          ? firstUnpaid[0]
+          : entries[entries.length - 1][0];
+
+        return <Tag color="blue">Termin {indexToShow}</Tag>;
+      },
+      onHeaderCell: () => ({ style: headerStyle }),
+      onCell: () => ({ style: cellStyle }),
+    },
+    // Dev
+    // {
+    //   title: 'Termin Pembayaran Saat Ini',
+    //   dataIndex: 'terminPembayaran',
+    //   key: 'terminPembayaran',
+    //   render: (text) => <Tag color="blue">{text}</Tag>,
+    //   onHeaderCell: () => ({ style: headerStyle }),
+    //   onCell: () => ({ style: cellStyle }),
+    // },
     {
       title: 'Status Pembayaran Termin',
       key: 'infoStatusPembayaran',
@@ -282,11 +334,17 @@ export default function DaftarKontrakPage() {
         </Title>
         <DataDashboard />
         <Table
-          dataSource={
-            user?.subBidang
-              ? kontrak.filter((item) => item.subBidang === user.subBidang)
-              : kontrak
-          }
+          // DEV
+          // dataSource={
+          //   user?.subBidang
+          //     ? kontrak.filter((item) => item.subBidang === user.subBidang)
+          //     : kontrak
+          // }
+          //
+          // PROD
+          dataSource={kontraks}
+          loading={isLoading}
+          //
           columns={columns}
           pagination={{ pageSize: 8 }}
           bordered

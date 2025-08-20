@@ -22,30 +22,74 @@ import {
   Kontrak,
   AmandemenKontrak,
   SuratPeringatan,
-  Vendor,
+  // Vendor,
+  TerminDetail,
 } from '@/types/types';
 import ViewPembayaranModal from '@/app/components/ViewPembayaran';
 import EvaluasiVendorModal from '@/app/components/EvaluasiVendor';
 import InputAmandemenModal from '@/app/components/InputAmandemen';
 import InputSuratPeringatanModal from '@/app/components/InputSuratPeringatan';
 import { motion, AnimatePresence } from 'framer-motion';
-import { kontrak, vendor } from '@/types/dummy';
+import { kontrak } from '@/types/dummy';
 import { useStore } from 'zustand';
 import { authStore } from '@/stores/useAuthStore';
+import { formatNumToRupiah } from '@/lib/currency';
+import { useQuery } from '@tanstack/react-query';
+import { formatDate } from '@/lib/date';
 
 const { Title, Text } = Typography;
 
 export default function DaftarVendorDetailPage() {
   const params = useParams();
   const id = params.id;
-  const filteredKontrak = kontrak.filter((k: Kontrak) => k.vendorKey === id);
-  const filteredVendor = vendor.filter((k: Vendor) => k.key === id);
-  const peringatanData = filteredVendor[0].suratPeringatanDetail;
-  const amandemenData = filteredKontrak
-    .map((k) => k.amandemenKontrakDetail)
-    .filter((a) => !!a);
   const user = useStore(authStore, (s) => s.user);
   const router = useRouter();
+  // Dev
+  // const filteredKontrak = kontrak.filter((k: Kontrak) => k.vendorKey === id);
+  // Prod
+  const { data: kontraks, isLoading: isLoadingKontraks } = useQuery({
+    queryKey: ['kontrak', user?.subBidang, id],
+    queryFn: async () => {
+      if (!user) return [];
+      let url = '';
+      if (user.subBidang && id) {
+        url = `/api/kontrak/get-kontrak-by-sub-bidang-and-vendor?subBidang=${encodeURIComponent(
+          user.subBidang
+        )}&vendorKey=${encodeURIComponent(Number(id))}`;
+      } else if (!user.subBidang && id) {
+        url = `/api/kontrak/get-kontrak-by-vendor?vendorKey=${encodeURIComponent(
+          Number(id)
+        )}`;
+      } else {
+        return [];
+      }
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Failed to fetch kontrak');
+      return res.json();
+    },
+    enabled: !!user && !!Number(id),
+  });
+  const filteredKontrak: Kontrak[] = kontraks || [];
+  const amandemenData: AmandemenKontrak[] = filteredKontrak
+    .map((k) => k.amandemenKontrakDetail)
+    .filter((a): a is AmandemenKontrak => !!a);
+  const { data: vendors, isLoading: isLoadingVendors } = useQuery({
+    queryKey: ['vendor', id],
+    queryFn: async () => {
+      if (!id) return null;
+
+      const res = await fetch(
+        `/api/vendor/get-vendor?id=${encodeURIComponent(Number(id))}`
+      );
+      if (!res.ok) throw new Error('Failed to fetch vendor');
+      return res.json();
+    },
+    enabled: !!id,
+  });
+  // const filteredVendor = vendors.filter((k: Vendor) => k.key === id);
+  // const peringatanData = filteredVendor[0].suratPeringatanDetail;
+  const peringatanData = vendors?.suratPeringatanDetail ?? [];
   const [showModal, setShowModal] = useState(false);
   const [showEvaluasiModal, setShowEvaluasiModal] = useState(false);
   const [selectedRecord, setSelectedRecord] = useState<Kontrak | null>(null);
@@ -58,14 +102,6 @@ export default function DaftarVendorDetailPage() {
   const handleEdit = (record: Kontrak) => {
     setSelectedRecord(record);
     setShowModal(true);
-  };
-
-  const formatRupiah = (number: number): string => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-    }).format(number);
   };
 
   const getColumnSearchProps = (
@@ -152,8 +188,11 @@ export default function DaftarVendorDetailPage() {
       dataIndex: 'tipePekerjaan',
       key: 'tipePekerjaan',
       filters: Array.from(
-        new Set(kontrak.map((item: Kontrak) => item.tipePekerjaan))
-      ).map((type: string) => ({ text: type, value: type })),
+        new Set(kontrak.map((item) => item.tipePekerjaan))
+      ).map((type) => ({
+        text: type,
+        value: type,
+      })),
       onFilter: (value, record) => record.tipePekerjaan === value,
       render: (tipe) => (
         <Tag color={tipe.includes('Pengembangan') ? 'geekblue' : 'volcano'}>
@@ -168,6 +207,7 @@ export default function DaftarVendorDetailPage() {
       dataIndex: 'direksiPekerjaan',
       key: 'direksiPekerjaan',
       ...getColumnSearchProps('direksiPekerjaan'),
+      render: (text) => <p>{text}</p>,
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
     },
@@ -176,6 +216,7 @@ export default function DaftarVendorDetailPage() {
       dataIndex: 'pengawasPekerjaan',
       key: 'pengawasPekerjaan',
       ...getColumnSearchProps('pengawasPekerjaan'),
+      render: (text) => <p>{text}</p>,
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
     },
@@ -184,6 +225,7 @@ export default function DaftarVendorDetailPage() {
       dataIndex: 'vendorKHS',
       key: 'vendorKHS',
       ...getColumnSearchProps('vendorKHS'),
+      render: (text) => <p>{text}</p>,
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
     },
@@ -193,7 +235,7 @@ export default function DaftarVendorDetailPage() {
       key: 'nilaiTotal',
       sorter: (a, b) => a.nilaiTotal - b.nilaiTotal,
       render: (value: number) => (
-        <span style={{ color: '#389e0d' }}>{formatRupiah(value)}</span>
+        <p style={{ color: '#389e0d' }}>{formatNumToRupiah(value)}</p>
       ),
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
@@ -203,6 +245,7 @@ export default function DaftarVendorDetailPage() {
       dataIndex: 'nomorKontrak',
       key: 'nomorKontrak',
       ...getColumnSearchProps('nomorKontrak'),
+      render: (text) => <p>{text}</p>,
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
     },
@@ -211,6 +254,7 @@ export default function DaftarVendorDetailPage() {
       dataIndex: 'nomorAmandemenKontrak',
       key: 'nomorAmandemenKontrak',
       ...getColumnSearchProps('nomorAmandemenKontrak'),
+      render: (text) => <p>{text || '-'}</p>,
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
     },
@@ -220,6 +264,7 @@ export default function DaftarVendorDetailPage() {
       key: 'tanggalMulai',
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
+      render: (value: string) => formatDate(value),
     },
     {
       title: 'Selesai Kontrak',
@@ -227,24 +272,57 @@ export default function DaftarVendorDetailPage() {
       key: 'tanggalSelesai',
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
+      render: (value: string) => formatDate(value),
     },
     {
-      title: 'Termin Pembayaran Saat Ini',
-      dataIndex: 'terminPembayaran',
-      key: 'terminPembayaran',
+      title: 'Jenis Termin Pembayaran',
+      dataIndex: 'jenisTerminPembayaran',
+      key: 'jenisTerminPembayaran',
       render: (text) => <Tag color="blue">{text}</Tag>,
       onHeaderCell: () => ({ style: headerStyle }),
       onCell: () => ({ style: cellStyle }),
     },
+    // Prod
+    {
+      title: 'Termin Pembayaran Saat Ini',
+      dataIndex: 'dataStatusPembayaran',
+      key: 'terminPembayaran',
+      render: (dataStatusPembayaran: Record<number, TerminDetail>) => {
+        if (!dataStatusPembayaran) return null;
+        const entries = Object.entries(dataStatusPembayaran);
+        const firstUnpaid = entries.find(
+          ([, termin]) => termin.status === 'Belum Terbayar'
+        );
+        const indexToShow = firstUnpaid
+          ? firstUnpaid[0]
+          : entries[entries.length - 1][0];
+
+        return <Tag color="blue">Termin {indexToShow}</Tag>;
+      },
+      onHeaderCell: () => ({ style: headerStyle }),
+      onCell: () => ({ style: cellStyle }),
+    },
+    // Dev
+    // {
+    //   title: 'Termin Pembayaran Saat Ini',
+    //   dataIndex: 'terminPembayaran',
+    //   key: 'terminPembayaran',
+    //   render: (text) => <Tag color="blue">{text}</Tag>,
+    //   onHeaderCell: () => ({ style: headerStyle }),
+    //   onCell: () => ({ style: cellStyle }),
+    // },
     {
       title: 'Status Pembayaran Termin',
       key: 'infoStatusPembayaran',
       width: 220,
       filters: Array.from(
-        new Set(kontrak.map((item: Kontrak) => item.infoStatusPembayaran))
-      ).map((type: string) => ({ text: type, value: type })),
+        new Set(kontrak.map((item) => item.infoStatusPembayaran))
+      ).map((type) => ({
+        text: type,
+        value: type,
+      })),
       onFilter: (value, record) => record.infoStatusPembayaran === value,
-      render: (_, record) => (
+      render: (_: Kontrak, record: Kontrak) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Tag
             color={
@@ -344,6 +422,8 @@ export default function DaftarVendorDetailPage() {
     },
   ];
 
+  if (isLoadingVendors) return <p>Loading...</p>;
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -374,7 +454,7 @@ export default function DaftarVendorDetailPage() {
               />
             </Col>
             <Col>
-              <Title level={4}>{filteredVendor[0].namaVendor}</Title>
+              <Title level={4}>{vendors?.namaVendor ?? '-'}</Title>
               <Text>📍 Jl. Contoh Alamat No.123, Jakarta Selatan</Text>
               <br />
               <Text>📞 (021) 123-4567</Text>
@@ -387,13 +467,8 @@ export default function DaftarVendorDetailPage() {
         <Card style={{ marginBottom: 24 }}>
           <Title level={3}>Daftar Kontrak</Title>
           <Table<Kontrak>
-            dataSource={
-              user?.subBidang
-                ? filteredKontrak.filter(
-                    (item: Kontrak) => item.subBidang === user.subBidang
-                  )
-                : filteredKontrak
-            }
+            dataSource={filteredKontrak}
+            loading={isLoadingKontraks}
             columns={columns}
             pagination={{ pageSize: 5 }}
             bordered

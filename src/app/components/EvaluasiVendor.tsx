@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Modal, Form, Select, Button, Row, Col, Result } from 'antd';
 import { Kontrak } from '@/types/types';
 import { CheckCircleOutlined } from '@ant-design/icons';
+import { formatDate } from '@/lib/date';
 
 const { Option } = Select;
 
@@ -24,7 +25,6 @@ export default function EvaluasiVendorModal({
   const handleSubmit = () => {
     form.validateFields().then((values) => {
       console.log('Submitted Evaluasi:', values);
-      // Simulate API call
       setTimeout(() => {
         setSubmitted(true);
         form.resetFields();
@@ -61,13 +61,15 @@ export default function EvaluasiVendorModal({
       ) : (
         <>
           <p>
-            <strong>Nama Proyek:</strong> {data.namaPekerjaan}
+            <strong>Nama Proyek: </strong> {data.namaPekerjaan}
           </p>
           <p>
-            <strong>Tanggal Berlaku Kontrak:</strong> {data.tanggalMulai}
+            <strong>Tanggal Berlaku Kontrak:</strong>{' '}
+            {formatDate(data.tanggalMulai)}
           </p>
           <p>
-            <strong>Tanggal Selesai Kontrak:</strong> {data.tanggalSelesai}
+            <strong>Tanggal Selesai Kontrak:</strong>{' '}
+            {formatDate(data.tanggalMulai)}
           </p>
 
           <Form layout="vertical" form={form}>
