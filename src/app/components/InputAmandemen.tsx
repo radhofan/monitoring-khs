@@ -1,25 +1,24 @@
 'use client';
 
+import { Kontrak } from '@/types/types';
+import { CheckCircleOutlined, UploadOutlined } from '@ant-design/icons';
+import type { FormItemProps, UploadFile } from 'antd';
 import {
-  Modal,
+  Button,
+  DatePicker,
   Form,
   Input,
-  DatePicker,
-  Upload,
-  Button,
   InputNumber,
-  Result,
   message,
+  Modal,
+  Result,
   Select,
+  Upload,
 } from 'antd';
-import { UploadOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import { useState } from 'react';
-import type { UploadFile } from 'antd';
-import type { FormItemProps } from 'antd';
 import type { Dayjs } from 'dayjs';
-import { Kontrak } from '@/types/types';
-import DOMPurify from 'dompurify';
 import dayjs from 'dayjs';
+import DOMPurify from 'dompurify';
+import { useState } from 'react';
 
 type InputAmandemenModalProps = {
   visible: boolean;

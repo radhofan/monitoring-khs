@@ -1,19 +1,19 @@
 'use client';
 
+import { CheckCircleOutlined, UploadOutlined } from '@ant-design/icons';
 import {
-  Modal,
+  Button,
+  DatePicker,
   Form,
   Input,
-  DatePicker,
-  Upload,
-  Button,
+  Modal,
   Result,
+  Upload,
   message,
 } from 'antd';
-import { UploadOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import { useState } from 'react';
-import DOMPurify from 'dompurify';
 import type { UploadFile } from 'antd/es/upload/interface';
+import DOMPurify from 'dompurify';
+import { useState } from 'react';
 
 type InputSuratPeringatanModalProps = {
   visible: boolean;

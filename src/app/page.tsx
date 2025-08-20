@@ -1,22 +1,21 @@
 'use client';
 
-import { useState } from 'react';
-import { Table, Typography, Tag, Card, Button, Input, Space } from 'antd';
-import type { ColumnsType } from 'antd/es/table';
-import { SearchOutlined } from '@ant-design/icons';
-import type { FilterDropdownProps } from 'antd/es/table/interface';
-import type { ColumnType } from 'antd/es/table';
-import { Kontrak, TerminDetail } from '@/types/types';
-import ViewPembayaranModal from '@/app/components/ViewPembayaran';
-import EvaluasiVendorModal from '@/app/components/EvaluasiVendor';
 import DataDashboard from '@/app/components/DataDashboard';
-import { motion, AnimatePresence } from 'framer-motion';
+import EvaluasiVendorModal from '@/app/components/EvaluasiVendor';
+import ViewPembayaranModal from '@/app/components/ViewPembayaran';
 import { formatNumToRupiah } from '@/lib/currency';
-import { useStore } from 'zustand';
+import { formatDate } from '@/lib/date';
 import { authStore } from '@/stores/useAuthStore';
 import { kontrak } from '@/types/dummy';
+import { Kontrak, TerminDetail } from '@/types/types';
+import { SearchOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { formatDate } from '@/lib/date';
+import { Button, Card, Input, Space, Table, Tag, Typography } from 'antd';
+import type { ColumnsType, ColumnType } from 'antd/es/table';
+import type { FilterDropdownProps } from 'antd/es/table/interface';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
+import { useStore } from 'zustand';
 
 const { Title } = Typography;
 

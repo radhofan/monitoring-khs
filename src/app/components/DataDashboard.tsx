@@ -1,11 +1,11 @@
 'use client';
 
-import { Card, Col, Row, Statistic, Tag } from 'antd';
 import {
-  ClockCircleOutlined,
   CheckCircleOutlined,
+  ClockCircleOutlined,
   DollarCircleOutlined,
 } from '@ant-design/icons';
+import { Card, Col, Row, Statistic, Tag } from 'antd';
 
 export default function DataDashboard() {
   const totalKontrak = 4;

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { Modal, Form, Select, Button, Row, Col, Result } from 'antd';
+import { formatDate } from '@/lib/date';
 import { Kontrak } from '@/types/types';
 import { CheckCircleOutlined } from '@ant-design/icons';
-import { formatDate } from '@/lib/date';
+import { Button, Col, Form, Modal, Result, Row, Select } from 'antd';
+import { useState } from 'react';
 
 const { Option } = Select;
 

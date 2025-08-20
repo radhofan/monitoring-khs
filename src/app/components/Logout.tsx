@@ -1,10 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { Button, Modal, message } from 'antd';
-import { LogoutOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation';
 import { authStore } from '@/stores/useAuthStore';
+import { LogoutOutlined } from '@ant-design/icons';
+import { Button, Modal, message } from 'antd';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export default function Logout() {
   const [open, setOpen] = useState(false);

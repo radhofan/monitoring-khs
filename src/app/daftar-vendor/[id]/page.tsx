@@ -1,41 +1,41 @@
 'use client';
 
-import { useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import EvaluasiVendorModal from '@/app/components/EvaluasiVendor';
+import InputAmandemenModal from '@/app/components/InputAmandemen';
+import InputSuratPeringatanModal from '@/app/components/InputSuratPeringatan';
+import ViewPembayaranModal from '@/app/components/ViewPembayaran';
+import { formatNumToRupiah } from '@/lib/currency';
+import { formatDate } from '@/lib/date';
+import { authStore } from '@/stores/useAuthStore';
+import { kontrak } from '@/types/dummy';
 import {
-  Table,
-  Typography,
-  Tag,
-  Card,
-  Button,
-  Avatar,
-  Row,
-  Col,
-  Input,
-  Space,
-} from 'antd';
-import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
-import type { ColumnsType } from 'antd/es/table';
-import type { FilterDropdownProps } from 'antd/es/table/interface';
-import type { ColumnType } from 'antd/es/table';
-import {
-  Kontrak,
   AmandemenKontrak,
+  Kontrak,
   SuratPeringatan,
   // Vendor,
   TerminDetail,
 } from '@/types/types';
-import ViewPembayaranModal from '@/app/components/ViewPembayaran';
-import EvaluasiVendorModal from '@/app/components/EvaluasiVendor';
-import InputAmandemenModal from '@/app/components/InputAmandemen';
-import InputSuratPeringatanModal from '@/app/components/InputSuratPeringatan';
-import { motion, AnimatePresence } from 'framer-motion';
-import { kontrak } from '@/types/dummy';
-import { useStore } from 'zustand';
-import { authStore } from '@/stores/useAuthStore';
-import { formatNumToRupiah } from '@/lib/currency';
+import { ArrowLeftOutlined, SearchOutlined } from '@ant-design/icons';
 import { useQuery } from '@tanstack/react-query';
-import { formatDate } from '@/lib/date';
+import {
+  Avatar,
+  Button,
+  Card,
+  Col,
+  Input,
+  Row,
+  Space,
+  Spin,
+  Table,
+  Tag,
+  Typography,
+} from 'antd';
+import type { ColumnsType, ColumnType } from 'antd/es/table';
+import type { FilterDropdownProps } from 'antd/es/table/interface';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { useStore } from 'zustand';
 
 const { Title, Text } = Typography;
 
@@ -422,7 +422,13 @@ export default function DaftarVendorDetailPage() {
     },
   ];
 
-  if (isLoadingVendors) return <p>Loading...</p>;
+  if (isLoadingVendors) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', padding: 20 }}>
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <motion.div

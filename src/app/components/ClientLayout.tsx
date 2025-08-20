@@ -1,10 +1,10 @@
 'use client';
 
-import { ReactNode, useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
-import { Spin } from 'antd';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import SidebarLayout from '@/app/components/SidebarLayout';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Spin } from 'antd';
+import { usePathname } from 'next/navigation';
+import { ReactNode, useEffect, useState } from 'react';
 import AuthBootstrapper from './AuthBootstrapper';
 
 const queryClient = new QueryClient();

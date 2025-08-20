@@ -1,23 +1,23 @@
 'use client';
 
-import { useState } from 'react';
+import { authStore } from '@/stores/useAuthStore';
+import { Kontrak } from '@/types/types';
+import { CheckCircleOutlined, FileOutlined } from '@ant-design/icons';
 import {
+  Button,
+  DatePicker,
+  Form,
+  message,
   Modal,
+  Result,
+  Select,
   Steps,
   Typography,
-  Form,
-  Select,
-  DatePicker,
-  Button,
-  message,
-  Result,
 } from 'antd';
-import { Kontrak } from '@/types/types';
-import { FileOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import type { Dayjs } from 'dayjs';
 import DOMPurify from 'dompurify';
+import { useState } from 'react';
 import { useStore } from 'zustand';
-import { authStore } from '@/stores/useAuthStore';
 
 const { Step } = Steps;
 const { Paragraph, Text, Link } = Typography;

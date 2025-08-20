@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect } from 'react';
 import { authStore } from '@/stores/useAuthStore';
+import { useEffect } from 'react';
 
 export default function AuthBootstrapper() {
   useEffect(() => {

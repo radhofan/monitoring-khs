@@ -1,27 +1,27 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { authStore } from '@/stores/useAuthStore';
+import { TerminDetail } from '@/types/types';
+import { CheckCircleOutlined, InboxOutlined } from '@ant-design/icons';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
-  Typography,
+  Button,
+  DatePicker,
   Divider,
   Input,
-  Select,
-  DatePicker,
   InputNumber,
-  Space,
   Radio,
-  Button,
   Result,
+  Select,
+  Space,
+  Typography,
   Upload,
 } from 'antd';
 import dayjs from 'dayjs';
-import { CheckCircleOutlined, InboxOutlined } from '@ant-design/icons';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { useStore } from 'zustand';
-import { authStore } from '@/stores/useAuthStore';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { TerminDetail } from '@/types/types';
 
 const { Title, Text } = Typography;
 const { Option } = Select;

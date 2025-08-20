@@ -1,9 +1,9 @@
 'use client';
 
 import { Button, Form, Input, Typography, message } from 'antd';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import Image from 'next/image';
 
 const { Title, Link, Text } = Typography;
 
