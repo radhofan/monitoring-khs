@@ -62,3 +62,46 @@ http://localhost:3000/api/kontrak/input-kontrak
 http://localhost:3000/api/kontrak/get-kontrak-by-sub-bidang-and-vendor?subBidang=ERP%20Finance&vendorKey=1
 
 http://localhost:3000/api/vendor/get-vendor-all
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### REVISI
+
+
+
+
+
+-amandemen lebih dari satu
+-update data berdasarkan amandemen

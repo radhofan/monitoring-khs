@@ -276,17 +276,19 @@ export default function DaftarVendorPage() {
       title: 'Total Proyek di Bidang',
       key: 'totalProyek',
       render: (_, record) => {
+        if (!user?.subBidang) return '-';
         const count = record.kontraks.filter(
-          (k) => k.subBidang === user?.subBidang
+          (k) => k.subBidang === user.subBidang
         ).length;
         return count;
       },
       sorter: (a, b) => {
+        if (!user?.subBidang) return 0; // no sorting if subBidang is null
         const aCount = a.kontraks.filter(
-          (k) => k.subBidang === user?.subBidang
+          (k) => k.subBidang === user.subBidang
         ).length;
         const bCount = b.kontraks.filter(
-          (k) => k.subBidang === user?.subBidang
+          (k) => k.subBidang === user.subBidang
         ).length;
         return aCount - bCount;
       },
