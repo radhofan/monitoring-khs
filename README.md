@@ -1,6 +1,6 @@
 ## How to Start App
 
-For detailed info on this app, please view the presentation file **Slide Deck KHS.pdf**
+### For detailed info on this app such as Use Case Diagram, ERD, Date Flow etc, please view the presentation file **Slide Deck KHS.pdf**
 
 You need nodejs installed, please follow instructions from here: https://nodejs.org/en/download
 
